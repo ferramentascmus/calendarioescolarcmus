@@ -4,7 +4,7 @@ Contido do paquete:
 
 - `index.html` · o calendario completo (unha soa páxina, sen build).
 - `config.js` · onde pos a URL e a clave do teu Supabase.
-- `supabase.sql` · as táboas e funcións da votación anónima (un voto por dispositivo) e da versión do profesorado. Todo o que crea empeza por `ccc_` (3 táboas e 13 funcións), así que non choca con nada do teu proxecto nin toca outras táboas.
+- `supabase.sql` · as táboas e funcións da votación anónima (un voto por dispositivo) e da versión do profesorado. Todo o que crea empeza por `ccc_` (3 táboas e 15 funcións), así que non choca con nada do teu proxecto nin toca outras táboas.
 
 ## Poñelo en marcha (uns 10 minutos)
 
@@ -23,6 +23,12 @@ Contido do paquete:
   - Dende que abre até que pecha, calquera con a ligazón pode votar. Se abren a páxina antes da hora, quedan esperando e actualízase soa.
   - Mentres corre podes *Pechar agora*, estender o peche (+2 / +5 min), quitar o peche automático, ou abrir antes se estaba programada. Cando está pechada podes *Reabrir*.
   - Podes decidir se os resultados os ven tamén quen vota ao pechar.
+
+## Gardado dos datos
+
+Na versión de Vercel as túas edicións gárdanse **soas no servidor** (Supabase) cando entras coa clave: preme o botón **«Servidor»** da cabeceira e introduce a clave (podes deixar que a lembre neste dispositivo). Dende ese momento o botón amosa «gardado hh:mm» tras cada cambio, e ao abrir a web noutro ordenador cárganse as mesmas datas. A primeira vez sube o que tiñas no navegador.
+Isto é o **borrador**; o que ve o profesorado é só o que publicas co botón *Publicar*.
+A copia de seguranza en `.json` só aparece na versión sen servidor.
 
 ## Que se ve e que non
 

@@ -237,6 +237,7 @@ body.proj .month{border-width:2px}
     <p id="hdrP">Días lectivos en Galicia cos festivos da Coruña e os prazos dos conservatorios. Usa «Marcar no calendario» para poñer datas tocando os días.</p>
   </div>
   <div class="row noprint">
+    <button class="btn" id="syncBtn" hidden>Servidor</button>
     <button class="btn" id="projBtn" aria-pressed="false">Modo proxección</button>
   </div>
 </header>
@@ -357,7 +358,7 @@ body.proj .month{border-width:2px}
     <div id="colorBox"></div>
     <div class="row" style="margin-top:.6rem"><button class="btn sm" id="colReset">Restablecer todas as cores</button></div>
   </div>
-  <div class="panel noprint">
+  <div class="panel noprint" id="bkPanel">
     <h2>Copia de seguranza</h2>
     <p class="small muted">Sen despregar en Vercel, os datos só se gardan neste navegador. Descarga unha copia para non perdelos e impórtaa cando volvas abrir o calendario (ou noutro dispositivo).</p>
     <div class="row">
@@ -516,7 +517,8 @@ function normState(){
   if(!/^\d{4}-\d{2}-\d{2}$/.test(S.start||''))S.start=DEF.start;
 }
 normState();
-function save(){if(RO)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+let synced=false,pushT=null;
+function save(){if(RO)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(CFG&&synced){clearTimeout(pushT);pushT=setTimeout(pushDraft,1200)}}
 
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,'0');
@@ -1139,9 +1141,9 @@ async function rpc(fn,args){
   if(!r.ok){const e=new Error((j&&(j.message||j.hint))||('Erro '+r.status));throw e}
   return j;
 }
-function adminKey(){try{return sessionStorage.getItem('calkey')||''}catch(e){return ''}}
-function setKey(k){try{if(k)sessionStorage.setItem('calkey',k);else sessionStorage.removeItem('calkey')}catch(e){}}
-function askKey(){const k=prompt('Clave de administración');if(k){setKey(k);return true}return false}
+function adminKey(){try{return sessionStorage.getItem('calkey')||localStorage.getItem('calkey-l')||''}catch(e){return ''}}
+function setKey(k){try{if(k)sessionStorage.setItem('calkey',k);else{sessionStorage.removeItem('calkey');localStorage.removeItem('calkey-l')}}catch(e){}}
+function askKey(){const k=prompt('Clave de administración');if(k){setKey(k);try{if(confirm('Lembrar a clave neste dispositivo? (Así non ta pide cada vez.)'))localStorage.setItem('calkey-l',k)}catch(e){}startSync();return true}return false}
 let srvOff=0;
 const srvNow=()=>Date.now()+srvOff;
 function localInput(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
@@ -1220,7 +1222,7 @@ async function vCall(fn,args){
 $('voteBox').addEventListener('click',async e=>{
   const b=e.target.closest('button');if(!b||!CFG)return;
   if(b.id==='vLogin'){if(askKey())loadVote()}
-  if(b.id==='vLogout'){setKey('');vs=null;renderVote()}
+  if(b.id==='vLogout'){setKey('');vs=null;synced=false;setSync('sen conectar');renderVote()}
   if(b.id==='vRefresh')loadVote();
   if(b.id==='vCopy'){try{await navigator.clipboard.writeText(b.dataset.link);toast('Ligazón copiada.')}catch(x){toast('Copia a ligazón a man.')}}
   if(b.id==='vOpen'){
@@ -1262,6 +1264,28 @@ setInterval(()=>{
   const tabOn=$('t-prop').classList.contains('on');
   if((edge||tabOn)&&Date.now()-lastPoll>(edge?2500:5000)){lastPoll=Date.now();loadVote()}
 },1000);
+
+/* Gardado no servidor (borrador do administrador) */
+const UIKEYS=['scope','mes','layout','z','proj','theme'];
+function draftData(){const o={};Object.keys(S).forEach(k=>{if(!UIKEYS.includes(k))o[k]=S[k]});return o}
+function applyDraft(d){Object.keys(d).forEach(k=>{if(!UIKEYS.includes(k))S[k]=d[k]})}
+function setSync(t){const b=$('syncBtn');if(!b)return;b.hidden=!CFG||RO;b.textContent='Servidor: '+t}
+async function pushDraft(){
+  if(!CFG||RO||!synced||!adminKey())return;
+  setSync('gardando…');
+  try{await rpc('ccc_admin_gardar',{p_clave:adminKey(),p_datos:draftData()});const d=new Date();setSync('gardado '+pad(d.getHours())+':'+pad(d.getMinutes()))}
+  catch(e){setSync('sen gardar');toast(errMsg(e));if(/clave_incorrecta/.test((e&&e.message)||'')){setKey('');synced=false}}
+}
+async function startSync(){
+  if(!CFG||RO||!adminKey())return;
+  setSync('conectando…');
+  try{
+    const d=await rpc('ccc_admin_ler',{p_clave:adminKey()});
+    if(d&&typeof d==='object'&&Object.keys(d).length){applyDraft(d);normState();ensureEval();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}synced=true;renderAll();const t=new Date();setSync('cargado '+pad(t.getHours())+':'+pad(t.getMinutes()))}
+    else{synced=true;await pushDraft()}
+  }catch(e){setSync('sen conectar');toast(errMsg(e));if(/clave_incorrecta/.test((e&&e.message)||''))setKey('')}
+}
+$('syncBtn').onclick=()=>{if(!adminKey()){askKey();return}if(synced)pushDraft();else startSync()};
 
 /* Versión do profesorado */
 function pubData(){return {start:S.start,locals:S.locals,centro:S.centro,extra:S.extra,e1:S.e1,e2:S.e2,e3:S.e3,acts:S.acts,hitos:S.hitos,colors:S.colors}}
@@ -1371,6 +1395,7 @@ if(MODE==='voto'){initVoter()}
 else{
   if(RO){$('hdrP').textContent='Datas do curso 2026-27 para o profesorado: días lectivos, festivos, avaliacións, exames e probas.'}
   ensureEval();renderAll();
+  if(CFG&&!RO){if($('bkPanel'))$('bkPanel').hidden=true;setSync(adminKey()?'conectando…':'sen conectar');if(adminKey())startSync()}
   if(MODE==='ver'&&CFG){rpc('ccc_publicado').then(d=>{if(d){applyPublished(d);S.e1=S.e1||'';ensureEval();renderAll()}}).catch(()=>{})}
 }
 })();

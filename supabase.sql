@@ -2,7 +2,7 @@
 --  Calendario do curso 2026-27 · votación anónima (un voto por dispositivo)
 --  e versión do profesorado.
 --
---  TODO o que crea este script empeza por  ccc_  (3 táboas e 13 funcións),
+--  TODO o que crea este script empeza por  ccc_  (3 táboas e 15 funcións),
 --  para que non choque con nada que xa teñas no proxecto de Supabase.
 --  Non modifica nin borra nada que non empece por ccc_.
 --
@@ -20,12 +20,16 @@ create table if not exists public.ccc_config (
   pin           text,
   opcions       jsonb not null default '[]'::jsonb,
   publicado     jsonb,
+  borrador      jsonb,
   abre_a        timestamptz,
   pecha_a       timestamptz,
   pechada_man   boolean not null default true,
   res_publicos  boolean not null default true,
   barallada     boolean not null default false
 );
+
+-- Se xa tiñas as táboas ccc_ dunha execución anterior, isto engade só a columna nova.
+alter table public.ccc_config add column if not exists borrador jsonb;
 
 -- Un rexistro por dispositivo e ronda: só di "este dispositivo xa votou". Sen nome.
 create table if not exists public.ccc_dispositivos (
@@ -220,6 +224,21 @@ begin
   update ccc_config set publicado = p_datos where id = 1;
 end $$;
 
+-- Borrador do administrador: as edicións do calendario gárdanse aquí (en vez de só no navegador).
+create or replace function public.ccc_admin_ler(p_clave text) returns jsonb
+language plpgsql security definer set search_path = public, extensions as $$
+begin
+  perform public.ccc_admin(p_clave);
+  return (select borrador from ccc_config where id = 1);
+end $$;
+
+create or replace function public.ccc_admin_gardar(p_clave text, p_datos jsonb) returns void
+language plpgsql security definer set search_path = public, extensions as $$
+begin
+  perform public.ccc_admin(p_clave);
+  update ccc_config set borrador = p_datos where id = 1;
+end $$;
+
 -- ---------- Permisos: a web (clave anon) só pode chamar estas funcións ----------
 revoke all on function public.ccc_ef(public.ccc_config) from public, anon, authenticated;
 revoke all on function public.ccc_baralla() from public, anon, authenticated;
@@ -232,6 +251,8 @@ grant execute on function public.ccc_admin_abrir(text, jsonb, timestamptz, times
 grant execute on function public.ccc_admin_pechar(text)                                        to anon, authenticated;
 grant execute on function public.ccc_admin_reabrir(text)                                       to anon, authenticated;
 grant execute on function public.ccc_admin_axustar(text, int, boolean, boolean, boolean)       to anon, authenticated;
+grant execute on function public.ccc_admin_ler(text)                                          to anon, authenticated;
+grant execute on function public.ccc_admin_gardar(text, jsonb)                                 to anon, authenticated;
 grant execute on function public.ccc_admin_publicar(text, jsonb)                               to anon, authenticated;
 
 -- ---------------------------------------------------------------------
