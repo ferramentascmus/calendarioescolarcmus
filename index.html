@@ -187,6 +187,7 @@ ul.clean li:last-child{border-bottom:0}
 .vwrap h1{font-size:2rem}
 .crow{display:grid;grid-template-columns:auto 1fr auto;gap:.6rem;align-items:center;padding:.3rem 0}
 input[type=color]{width:2.6rem;height:2.2rem;padding:0;border:1px solid var(--line);border-radius:.4rem;background:none;cursor:pointer}
+.adminlink{margin-top:2rem;text-align:center;opacity:.75}
 .vbanner{border:3px solid var(--o1);background:var(--card);border-radius:1rem;padding:.8rem 1rem;margin:.6rem 0;display:flex;gap:1rem;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .vbanner[hidden]{display:none}
 .vbanner .btn{font-size:1.1rem;padding:.7rem 1.4rem;text-decoration:none;display:inline-block}
@@ -293,6 +294,7 @@ input[type=color]{width:2.6rem;height:2.2rem;padding:0;border:1px solid var(--li
   </div>
   <div class="sum" id="sum"></div>
   <div class="legend" id="legend"></div>
+  <div id="propSum"></div>
   <div id="months"></div>
 </section>
 
@@ -426,6 +428,8 @@ input[type=color]{width:2.6rem;height:2.2rem;padding:0;border:1px solid var(--li
     </ul>
   </div>
 </section>
+
+<div class="adminlink noprint" id="adminEntry" hidden><button class="btn sm" id="adminGo">Administración</button></div>
 </div>
 
 <div id="voterPage" hidden></div>
@@ -519,6 +523,8 @@ function normState(){
   S.props=S.props.slice(0,8).map(x=>typeof x==='string'?x:'');
   while(S.props.length<3)S.props.push('');
   if(!Array.isArray(S.cands))S.cands=[];
+  if(!Array.isArray(S.hideSug))S.hideSug=[];
+  if(!S.candsSeed){if(!S.cands.length)S.cands=[{d:'2027-01-08',n:''},{d:'2027-02-11',n:''},{d:'2027-03-18',n:''}];S.candsSeed=true}
   if(!Array.isArray(S.locals))S.locals=clone(DEF.locals);
   if(!Array.isArray(S.centro))S.centro=[];
   if(!Array.isArray(S.extra))S.extra=[];
@@ -582,7 +588,27 @@ function range(){
   return ['2026-09-01',VEND];
 }
 function scopeLabel(){return S.scope==='mes'?cap(MES[(8+S.mes)%12])+' '+(S.mes<4?2026:2027):SCOPE_NAME[S.scope]}
-function activeProps(){return S.props}
+function voteOpts(){const st=RO?banSt:vs;return (st&&st.opcions&&st.opcions.length&&(st.estado==='aberta'||st.estado==='programada'))?st.opcions:[]}
+function activeProps(){
+  if(S.props.some(Boolean))return S.props;
+  const vo=voteOpts();
+  if(vo.length){const a=['','','','','','','',''];vo.forEach(o=>{const i=LET.indexOf(o.l);if(i>=0)a[i]=o.d});return a}
+  return S.props;
+}
+let lastOptSig='';
+function refreshProps(){const s=JSON.stringify(voteOpts());if(s!==lastOptSig){lastOptSig=s;renderMonths();renderPropSum()}}
+function renderPropSum(){
+  const box=$('propSum');if(!box)return;
+  const P=activeProps(),items=[];
+  P.forEach((d,i)=>{if(d)items.push(i)});
+  if(!items.length){box.innerHTML='';return}
+  box.innerHTML='<div class="panel"><h3 style="margin-top:0">Propostas para o día non lectivo do centro</h3><div class="slots">'+items.map(i=>{
+    const s=P[i],I=info(s);let eff='';
+    if(I.t==='lect'){const e=effect(s);eff='Descanso de '+e.rest+' días · '+WD[e.wi]+' '+e.before+' → '+e.after+' · '+(e.ev===4?'ampliación e recuperación':e.ev+'ª avaliación')}
+    else eff='Non é un día lectivo ('+I.n+').';
+    return '<div class="slot" style="--o:'+OCOL[i]+'"><div class="row"><span class="let">'+LET[i]+'</span><b>'+esc(cap(fmtL(s)))+'</b></div><div class="small muted" style="margin-top:.3rem">'+esc(eff)+'</div></div>';
+  }).join('')+'</div></div>';
+}
 function rangeCount(){return S.scope==='t3'?[add(S.e2,1),S.e3]:range()}
 const AMP='Ampliación e recuperación (con clase)';
 
@@ -811,14 +837,15 @@ function renderProp(){
   $('candList').innerHTML=S.cands.length?S.cands.map(candHTML).join(''):'<p class="small muted">Aínda non hai días na lista.</p>';
 
   const c=wcount(lectivos()),mx=Math.max(...c);
-  const R=runs().filter(r=>r.length<=2).map(r=>({r:r,pre:offAround(r[0],-1),post:offAround(r[r.length-1],1)})).filter(x=>x.pre>0&&x.post>0).map(x=>({r:x.r,total:x.pre+x.r.length+x.post})).sort((a,b)=>a.r.length-b.r.length||b.total-a.total);
+  const R=runs().filter(r=>r.length<=2).map(r=>({r:r,pre:offAround(r[0],-1),post:offAround(r[r.length-1],1)})).filter(x=>x.pre>0&&x.post>0).map(x=>({r:x.r.filter(s=>!S.hideSug.includes(s)),total:x.pre+x.r.length+x.post})).filter(x=>x.r.length).sort((a,b)=>a.r.length-b.r.length||b.total-a.total);
   let ch=R.length?'':'<p class="small">Non quedan días soltos entre períodos non lectivos.</p>';
   R.forEach(x=>{
     const names=x.r.map(fmtL).join(' e ');
     const hits=x.r.some(s=>c[dow(s)-1]===mx&&Math.min(...c)!==mx);
     ch+='<div class="cand"><div><b>'+esc(cap(names))+'</b><div class="small muted">Descanso de '+x.total+' días seguidos'+(x.r.length>1?' se se marcan os dous':'')+'.'+(hits?' <span class="tag">resta ao día con máis lectivos</span>':'')+'</div></div><div class="row">'+
-      x.r.map(s=>S.cands.some(k=>k.d===s)?'<span class="small muted">'+fmt(s)+' na lista</span>':'<button class="btn sm" data-addcand="'+s+'">Engadir '+fmt(s)+' á lista</button>').join('')+'</div></div>';
+      x.r.map(s=>(S.cands.some(k=>k.d===s)?'<span class="small muted">'+fmt(s)+' na lista</span>':'<button class="btn sm" data-addcand="'+s+'">Engadir '+fmt(s)+' á lista</button>')+'<button class="btn sm" data-hidesug="'+s+'" aria-label="Quitar a suxestión do '+fmt(s)+'" title="Quitar esta suxestión">✕</button>').join('')+'</div></div>';
   });
+  if(S.hideSug.length)ch+='<div class="row noprint" style="margin-top:.6rem"><button class="btn sm" id="restoreSug">Restaurar '+S.hideSug.length+(S.hideSug.length>1?' suxestións ocultas':' suxestión oculta')+'</button></div>';
   $('cands').innerHTML=ch;
 }
 
@@ -914,7 +941,7 @@ function commit(){ensureEval();save();renderAll()}
 function renderAll(){
   ensureEval();renderTools();renderCounter();renderLegend();renderSum();renderMonths();
   if(!RO){renderProp();renderAjustes();renderTally();renderVote()}
-  renderEval();renderExa();
+  renderEval();renderExa();renderPropSum();
 }
 
 /* Folla de accións */
@@ -993,6 +1020,8 @@ $('t-prop').addEventListener('click',e=>{
   if(d.cprop!==undefined){const c=S.cands[+d.cprop];if(c&&c.d&&addProp(c.d))commit()}
   if(d.cunprop!==undefined){const c=S.cands[+d.cunprop];if(c){const i=S.props.indexOf(c.d);if(i>=0)S.props[i]='';commit()}}
   if(d.addcand){S.cands.push({d:d.addcand,n:''});commit()}
+  if(d.hidesug){if(!S.hideSug.includes(d.hidesug))S.hideSug.push(d.hidesug);commit()}
+  if(t.id==='restoreSug'){S.hideSug=[];commit()}
   if(d.tp){S.tally[d.tp]=(S.tally[d.tp]||0)+1;save();renderTally()}
   if(d.tm){S.tally[d.tm]=Math.max(0,(S.tally[d.tm]||0)-1);save();renderTally()}
 });
@@ -1019,7 +1048,7 @@ $('addLocal').onclick=()=>{S.locals.push({d:'',n:'Festivo local'});save();render
 $('extras').addEventListener('click',e=>{const b=e.target.closest('[data-unext]');if(b){S.extra=S.extra.filter(x=>x!==b.dataset.unext);commit()}});
 $('hitosChk').onchange=e=>{S.hitos=e.target.checked;save();renderMonths()};
 $('printBtn').onclick=()=>window.print();
-$('resetBtn').onclick=()=>{if(confirm('Borrar todos os cambios e volver ao calendario oficial?')){S=clone(DEF);commit()}};
+$('resetBtn').onclick=()=>{if(confirm('Borrar todos os cambios e volver ao calendario oficial?')){S=clone(DEF);normState();commit()}};
 $('copyBtn').onclick=()=>{
   const L=lectivos(),c=wcount(L);
   let t='Curso 2026-27\nDías lectivos: '+L.length+'\n'+WD.map((w,i)=>w+': '+c[i]).join(', ')+'\n';
@@ -1168,6 +1197,7 @@ async function loadVote(){
     vs=await rpc('ccc_admin_estado',{p_clave:adminKey()});
     if(vs&&vs.agora)srvOff=Date.parse(vs.agora)-Date.now();
     vmsg='';
+    refreshProps();
   }catch(e){vmsg=errMsg(e);if(/clave_incorrecta/.test((e&&e.message)||'')){setKey('');vs=null}}
   renderVote();
 }
@@ -1209,6 +1239,7 @@ function renderVote(){
           h+='<div class="panel" style="margin:.8rem 0">'+
             (st.estado==='programada'?'<p style="margin:0"><b>Abre o '+fmtDT(st.abre_a)+'</b> (en <span data-until="'+esc(st.abre_a)+'">…</span>)</p>':'<p style="margin:0"><b>Votación aberta</b></p>')+
             '<p class="small" style="margin:.2rem 0">'+(st.pecha_a?'Pecha o <b>'+fmtDT(st.pecha_a)+'</b> (quedan <span data-until="'+esc(st.pecha_a)+'">…</span>)':'Sen peche automático: péchase a man.')+'</p>'+
+            '<p class="small" style="margin:.2rem 0">Opcións: '+st.opcions.map(o=>'<b>'+o.l+'</b> '+esc(fmt(o.d))).join(' · ')+'</p>'+
             '<div class="row" style="margin:.4rem 0"><span class="small muted">Código</span> <span class="pinbig" style="font-size:1.5rem">'+esc(st.pin)+'</span></div>'+
             '<div class="small" style="overflow-wrap:anywhere;margin:.3rem 0"><a href="'+esc(link)+'" target="_blank" rel="noopener">'+esc(link)+'</a></div>'+
             '<div class="row"><button class="btn pri sm" id="vQR">Amosar o QR grande</button><button class="btn sm" id="vCopy" data-link="'+esc(link)+'">Copiar ligazón</button></div></div>';
@@ -1352,16 +1383,18 @@ async function startSync(){
     const d=await rpc('ccc_admin_ler',{p_clave:adminKey()});
     if(d&&typeof d==='object'&&Object.keys(d).length){applyDraft(d);normState();ensureEval();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}synced=true;renderAll();const t=new Date();setSync('cargado '+pad(t.getHours())+':'+pad(t.getMinutes()))}
     else{synced=true;await pushDraft()}
+    loadVote();
   }catch(e){setSync('sen conectar');toast(errMsg(e));if(/clave_incorrecta/.test((e&&e.message)||''))setKey('')}
 }
 $('syncBtn').onclick=()=>{if(!adminKey()){askKey();return}if(synced)pushDraft();else startSync()};
 
 /* Versión do profesorado */
-function pubData(){return {start:S.start,locals:S.locals,centro:S.centro,extra:S.extra,e1:S.e1,e2:S.e2,e3:S.e3,acts:S.acts,hitos:S.hitos,colors:S.colors}}
+function pubData(){return {start:S.start,locals:S.locals,centro:S.centro,extra:S.extra,e1:S.e1,e2:S.e2,e3:S.e3,acts:S.acts,hitos:S.hitos,colors:S.colors,props:S.props}}
 function applyPublished(d){
   if(!d||typeof d!=='object')return;
   ['start','e1','e2','e3'].forEach(k=>{if(typeof d[k]==='string')S[k]=d[k]});
   if(d.colors&&typeof d.colors==='object'&&!Array.isArray(d.colors))S.colors=d.colors;
+  if(Array.isArray(d.props)){S.props=d.props.slice(0,8).map(x=>typeof x==='string'?x:'');while(S.props.length<3)S.props.push('')}
   ['locals','centro','extra'].forEach(k=>{if(Array.isArray(d[k]))S[k]=d[k]});
   if(d.acts&&typeof d.acts==='object')S.acts=d.acts;
   if(typeof d.hitos==='boolean')S.hitos=d.hitos;
@@ -1469,7 +1502,18 @@ function renderBanner(){
   el.innerHTML='<div><b>Votación aberta: día non lectivo do centro</b><div class="small muted">'+sub+'</div></div><a class="btn pri" href="?votar=1&k='+encodeURIComponent(st.pin)+'">'+(st.estado==='programada'?'Ver a votación':'Votar')+'</a>';
   tickCountdowns();
 }
-async function pollBanner(){try{banSt=await rpc('ccc_estado');if(banSt&&banSt.agora)srvOff=Date.parse(banSt.agora)-Date.now()}catch(e){return}renderBanner()}
+async function pollBanner(){try{banSt=await rpc('ccc_estado');if(banSt&&banSt.agora)srvOff=Date.parse(banSt.agora)-Date.now()}catch(e){return}refreshProps();renderBanner()}
+
+/* Entrar como administración desde a páxina principal (vista de só lectura) */
+$('adminGo').onclick=async()=>{
+  let k=adminKey();const fresh=!k;
+  if(!k){k=(prompt('Clave de administración')||'').trim();if(!k)return}
+  try{await rpc('ccc_admin_estado',{p_clave:k})}
+  catch(e){if(/clave_incorrecta/.test((e&&e.message)||'')){setKey('');toast('Clave incorrecta.')}else toast(errMsg(e));return}
+  setKey(k);
+  if(fresh){try{if(confirm('Lembrar a clave neste dispositivo?\n\nAceptar: non ta pedirá máis (recomendado no teu equipo persoal).\nCancelar: pedirache de novo cando peches a pestana.'))localStorage.setItem('calkey-l',k)}catch(e){}}
+  location.href=location.pathname+'?admin=1';
+};
 
 /* ================= Arranque ================= */
 if(RO)document.body.classList.add('ro');
@@ -1479,6 +1523,7 @@ else{
   ensureEval();renderAll();
   if(CFG&&!RO){if($('bkPanel'))$('bkPanel').hidden=true;setSync(adminKey()?'conectando…':'sen conectar');if(adminKey())startSync()}
   if(MODE==='ver'&&CFG){
+    $('adminEntry').hidden=false;
     let lastPub='';
     const pollPub=async()=>{try{const d=await rpc('ccc_publicado');const s=JSON.stringify(d||null);if(s!==lastPub){lastPub=s;if(d){applyPublished(d);ensureEval();renderAll()}}}catch(e){}};
     pollPub();pollBanner();
