@@ -187,6 +187,17 @@ ul.clean li:last-child{border-bottom:0}
 .vwrap h1{font-size:2rem}
 .crow{display:grid;grid-template-columns:auto 1fr auto;gap:.6rem;align-items:center;padding:.3rem 0}
 input[type=color]{width:2.6rem;height:2.2rem;padding:0;border:1px solid var(--line);border-radius:.4rem;background:none;cursor:pointer}
+.vbanner{border:3px solid var(--o1);background:var(--card);border-radius:1rem;padding:.8rem 1rem;margin:.6rem 0;display:flex;gap:1rem;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.vbanner[hidden]{display:none}
+.vbanner .btn{font-size:1.1rem;padding:.7rem 1.4rem;text-decoration:none;display:inline-block}
+.qrbox{background:#fff;padding:14px;border-radius:14px;display:inline-block;line-height:0}
+.qrbox canvas{display:block;width:min(78vw,340px)!important;height:auto!important}
+.qrbox img{max-width:100%}
+.qrlink{font-size:1.05rem;overflow-wrap:anywhere;margin:.4rem 0}
+.qrfull{position:fixed;inset:0;z-index:40;background:#fff;color:#111B2E;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;padding:1rem;text-align:center;cursor:pointer}
+.qrfull[hidden]{display:none}
+.qrfull .qrbox canvas{width:min(70vmin,620px)!important}
+.qrfull h2{font-size:clamp(1.4rem,4vw,2.4rem);margin:0}
 .pinbig{font:800 2rem var(--display);letter-spacing:.1em}
 #qr canvas,#qr img{max-width:100%;height:auto}
 
@@ -202,12 +213,6 @@ input[type=color]{width:2.6rem;height:2.2rem;padding:0;border:1px solid var(--li
 .toast.on{opacity:1}
 @media (prefers-reduced-motion:reduce){.sheet,.toast{transition:none}}
 
-body.proj header p,body.proj .noproj{display:none}
-body.proj .wrap{max-width:none;padding:0 1.2rem 5rem}
-body.proj h1{font-size:2.2rem}
-body.proj header{padding:.6rem 0 .2rem}
-body.proj .d{font-weight:800}
-body.proj .month{border-width:2px}
 
 @media (max-width:560px){
   .wrap{padding:0 .5rem 5rem}
@@ -238,15 +243,17 @@ body.proj .month{border-width:2px}
   </div>
   <div class="row noprint">
     <button class="btn" id="syncBtn" hidden>Servidor</button>
-    <button class="btn" id="projBtn" aria-pressed="false">Modo proxección</button>
   </div>
 </header>
+
+<div id="voteBanner" class="vbanner" hidden></div>
 
 <div class="counter" aria-live="polite"><div class="counter-in" id="counter"></div></div>
 
 <nav class="tabs" role="tablist">
   <button role="tab" data-t="cal" aria-selected="true">Calendario</button>
   <button role="tab" class="edit" data-t="prop" aria-selected="false">Propostas e votación</button>
+  <button role="tab" class="edit" data-t="qr" aria-selected="false">Código QR</button>
   <button role="tab" data-t="exa" aria-selected="false">Exames e probas</button>
   <button role="tab" data-t="ava" aria-selected="false">Avaliacións</button>
   <button role="tab" class="edit" data-t="aju" aria-selected="false">Axustes</button>
@@ -317,6 +324,8 @@ body.proj .month{border-width:2px}
     <div class="row noprint" style="margin-top:.6rem"><button class="btn sm" id="tallyReset">Poñer a cero</button></div>
   </div>
 </section>
+
+<section class="tab" id="t-qr"><div class="panel" id="qrPanel" style="text-align:center"></div></section>
 
 <section class="tab" id="t-exa"><div id="exaOut"></div></section>
 
@@ -431,15 +440,17 @@ body.proj .month{border-width:2px}
   </div>
 </div>
 <div class="toast" id="toast" role="status"></div>
+<div id="qrFull" class="qrfull" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="config.js"></script>
 <script>
 (function(){
 const Q=new URLSearchParams(location.search);
-const MODE=Q.get('votar')?'voto':(Q.get('ver')?'ver':'admin');
-const RO=MODE!=='admin';
 const CFG=(window.CALENDARIO_CONFIG&&window.CALENDARIO_CONFIG.url&&window.CALENDARIO_CONFIG.key&&!/TU-PROYECTO/i.test(window.CALENDARIO_CONFIG.url))?window.CALENDARIO_CONFIG:null;
+/* Coa versión de servidor, a dirección simple é de SÓ LECTURA; a administración está en ?admin=1 */
+const MODE=Q.get('votar')?'voto':(Q.get('admin')?'admin':((Q.get('ver')||CFG)?'ver':'admin'));
+const RO=MODE!=='admin';
 
 const WD=['Luns','Martes','Mércores','Xoves','Venres'];
 const WD3=['Lun','Mar','Mér','Xov','Ven'];
@@ -720,10 +731,7 @@ function renderTools(){
   $('mesNav').hidden=S.scope!=='mes';
   let o='';for(let m=0;m<11;m++){const mo=(8+m)%12;o+='<option value="'+m+'"'+(m===S.mes?' selected':'')+'>'+cap(MES[mo])+' '+(m<4?2026:2027)+'</option>'}
   $('mSel').innerHTML=o;
-  $('projBtn').setAttribute('aria-pressed',S.proj);
-  $('projBtn').textContent=S.proj?'Saír da proxección':'Modo proxección';
   $('themeBtn').textContent='Tema: '+({auto:'automático',light:'claro',dark:'escuro'}[S.theme]);
-  document.body.classList.toggle('proj',!!S.proj);
   document.documentElement.style.fontSize=(16*S.z)+'px';
   if(S.theme==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',S.theme);
   if(!RO)renderToolHint();
@@ -948,7 +956,7 @@ $('shActs').addEventListener('click',e=>{
   commit();openSheet(s);
 });
 $('shClose').onclick=closeSheet;
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSheet();if(qrFullOpen){qrFullOpen=false;$('qrFull').hidden=true}}});
 $('months').addEventListener('click',e=>{
   const b=e.target.closest('.d');if(!b)return;
   if(!RO&&tool){applyTool(b.dataset.s);return}
@@ -960,7 +968,7 @@ document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
   document.querySelectorAll('section.tab').forEach(x=>x.classList.toggle('on',x.id==='t-'+b.dataset.t));
   closeSheet();
-  if(b.dataset.t==='prop'&&CFG&&adminKey())loadVote();
+  if((b.dataset.t==='prop'||b.dataset.t==='qr')&&CFG&&adminKey())loadVote();
 });
 $('scopeSeg').addEventListener('click',e=>{const b=e.target.closest('[data-scope]');if(b){S.scope=b.dataset.scope;save();renderAll()}});
 $('layoutSeg').addEventListener('click',e=>{const b=e.target.closest('[data-layout]');if(b){S.layout=b.dataset.layout;save();renderAll()}});
@@ -969,7 +977,6 @@ $('mPrev').onclick=()=>{S.mes=Math.max(0,S.mes-1);save();renderAll()};
 $('mNext').onclick=()=>{S.mes=Math.min(10,S.mes+1);save();renderAll()};
 $('zMinus').onclick=()=>{S.z=Math.max(.8,Math.round((S.z-.1)*10)/10);save();renderAll()};
 $('zPlus').onclick=()=>{S.z=Math.min(1.8,Math.round((S.z+.1)*10)/10);save();renderAll()};
-$('projBtn').onclick=()=>{S.proj=!S.proj;if(S.proj&&S.z<1.2)S.z=1.25;if(!S.proj)S.z=1;save();renderAll()};
 $('themeBtn').onclick=()=>{S.theme=({auto:'light',light:'dark',dark:'auto'})[S.theme];save();renderAll()};
 $('tool').onchange=e=>{tool=e.target.value;pend=null;renderToolHint()};
 $('toolDone').onclick=()=>{tool='';pend=null;renderToolHint()};
@@ -1136,14 +1143,16 @@ $('impFile').onchange=e=>{
 const ERR={clave_incorrecta:'Clave incorrecta.',votacion_pechada:'A votación non está aberta agora.',pin_incorrecto:'Ligazón ou código non válido. Escanea de novo o QR.',xa_votou:'Este dispositivo xa votou nesta ronda.',opcion_invalida:'Opción non válida.',dispositivo_invalido:'Non se puido identificar o dispositivo. Recarga a páxina.',datas_invalidas:'A hora de peche debe ser posterior á de apertura (e futura).'};
 function errMsg(e){const m=(e&&e.message)||'';for(const k in ERR)if(m.indexOf(k)>=0)return ERR[k];return 'Non se puido conectar coa votación. Téntao de novo.'}
 async function rpc(fn,args){
-  const r=await fetch(CFG.url.replace(/\/$/,'')+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.key,Authorization:'Bearer '+CFG.key},body:JSON.stringify(args||{})});
+  const hd={'Content-Type':'application/json',apikey:CFG.key};
+  if(/^eyJ/.test(CFG.key))hd.Authorization='Bearer '+CFG.key; /* a chave antiga (anon, JWT) leva Bearer; a nova (sb_publishable_…) só apikey */
+  const r=await fetch(CFG.url.replace(/\/$/,'')+'/rest/v1/rpc/'+fn,{method:'POST',headers:hd,body:JSON.stringify(args||{})});
   const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(x){}
   if(!r.ok){const e=new Error((j&&(j.message||j.hint))||('Erro '+r.status));throw e}
   return j;
 }
 function adminKey(){try{return sessionStorage.getItem('calkey')||localStorage.getItem('calkey-l')||''}catch(e){return ''}}
 function setKey(k){try{if(k)sessionStorage.setItem('calkey',k);else{sessionStorage.removeItem('calkey');localStorage.removeItem('calkey-l')}}catch(e){}}
-function askKey(){const k=prompt('Clave de administración');if(k){setKey(k);try{if(confirm('Lembrar a clave neste dispositivo? (Así non ta pide cada vez.)'))localStorage.setItem('calkey-l',k)}catch(e){}startSync();return true}return false}
+function askKey(){const k=(prompt('Clave de administración')||'').trim();if(k){setKey(k);try{if(confirm('Lembrar a clave neste dispositivo?\n\nAceptar: non ta pedirá máis (recomendado no teu equipo persoal).\nCancelar: pedirache de novo cando peches a pestana.'))localStorage.setItem('calkey-l',k)}catch(e){}startSync();return true}return false}
 let srvOff=0;
 const srvNow=()=>Date.now()+srvOff;
 function localInput(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
@@ -1152,7 +1161,7 @@ function cd(iso){const s=Math.max(0,Math.round((Date.parse(iso)-srvNow())/1000))
 function tickCountdowns(){document.querySelectorAll('[data-until]').forEach(el=>{el.textContent=cd(el.dataset.until)})}
 
 let vs=null,vmsg='';
-const vf={abre:'now',abreAt:'',pecha:'man',min:5,pechaAt:'',pub:true};
+const vf={abre:'now',abreAt:'',pecha:'man',min:5,pechaAt:'',pub:true,boton:true};
 async function loadVote(){
   if(!CFG||!adminKey())return;
   try{
@@ -1170,6 +1179,7 @@ function resultsHTML(opcions,conta){
   const x=cnt.X||0;h+='<div class="res" style="--o:var(--muted)"><div class="rl"><span>Abstención</span><span>'+x+' ('+Math.round(x/tot*100)+'%)</span></div><div class="rb"><i style="width:'+(x/tot*100)+'%"></i></div></div>';
   return h;
 }
+function voteLink(st){return location.origin+location.pathname+'?votar=1&k='+st.pin}
 function voteForm(){
   const np=S.props.filter(Boolean).length;
   if(!vf.abreAt)vf.abreAt=localInput(new Date(Date.now()+10*60000));
@@ -1179,41 +1189,92 @@ function voteForm(){
    '<div class="fld"><label>Cando abre</label><div class="row">'+rad('vAbre','now',vf.abre,'Agora')+rad('vAbre','prog',vf.abre,'Programar')+'<input type="datetime-local" id="vAbreAt" value="'+vf.abreAt+'"'+(vf.abre==='prog'?'':' disabled')+'></div></div>'+
    '<div class="fld"><label>Cando pecha</label><div class="row">'+rad('vPecha','man',vf.pecha,'A man')+rad('vPecha','min',vf.pecha,'En')+'<input type="number" id="vMin" min="1" max="600" value="'+vf.min+'" style="width:4.5rem"'+(vf.pecha==='min'?'':' disabled')+'> <span class="small">minutos desde que abre</span>'+rad('vPecha','prog',vf.pecha,'Programar')+'<input type="datetime-local" id="vPechaAt" value="'+vf.pechaAt+'"'+(vf.pecha==='prog'?'':' disabled')+'></div></div>'+
    '<label class="row small"><input type="checkbox" id="vPub"'+(vf.pub?' checked':'')+'> Amosar os resultados a quen vota cando se peche</label>'+
+   '<label class="row small"><input type="checkbox" id="vBotonF"'+(vf.boton?' checked':'')+'> Amosar o botón «Votar» a quen está vendo o calendario</label>'+
    '<div class="row" style="margin-top:.6rem"><button class="btn pri" id="vOpen"'+(np<2?' disabled':'')+'>Crear votación coas '+np+' propostas</button></div>'+
    (np<2?'<p class="small muted">Necesitas polo menos dúas propostas con data.</p>':'');
 }
 function renderVote(){
-  const box=$('voteBox');if(!box)return;
-  if(!CFG){box.innerHTML='<p class="small muted">Votar desde os móbiles (QR ou ligazón) precisa da versión publicada no teu Vercel con Supabase; o README do paquete explica como. Mentres tanto, usa o reconto a man.</p>';return}
-  if(!adminKey()){box.innerHTML='<p class="small">Para abrir, pechar e axustar votacións, entra coa clave de administración.</p><button class="btn pri" id="vLogin">Entrar como administración</button>'+(vmsg?'<p class="small note">'+esc(vmsg)+'</p>':'');return}
-  const st=vs,ES={aberta:'aberta',programada:'programada',pechada:'pechada'};
-  let h='<div class="row" style="justify-content:space-between"><span class="small">'+(st?('<b>'+(st.ronda?'Ronda '+st.ronda:'Sen votacións')+'</b>'+(st.ronda?' · '+ES[st.estado]:'')):'Cargando…')+'</span><span class="row"><button class="btn sm" id="vRefresh">Actualizar</button><button class="btn sm" id="vLogout">Saír</button></span></div>';
-  if(st){
-    const active=st.estado==='aberta'||st.estado==='programada';
-    if(active){
-      const link=location.origin+location.pathname+'?votar=1&k='+st.pin;
-      h+='<div class="panel" style="margin:.8rem 0"><div class="row" style="gap:1rem;align-items:flex-start"><div id="qr" style="min-width:120px"></div><div style="min-width:0">'+
-        (st.estado==='programada'?'<p style="margin:0"><b>Abre o '+fmtDT(st.abre_a)+'</b> (en <span data-until="'+esc(st.abre_a)+'">…</span>)</p>':'<p style="margin:0"><b>Votación aberta</b></p>')+
-        '<p class="small" style="margin:.2rem 0">'+(st.pecha_a?'Pecha o <b>'+fmtDT(st.pecha_a)+'</b> (quedan <span data-until="'+esc(st.pecha_a)+'">…</span>)':'Sen peche automático: péchase a man.')+'</p>'+
-        '<div class="small muted">Código</div><div class="pinbig">'+esc(st.pin)+'</div><div class="small" style="overflow-wrap:anywhere;margin:.3rem 0"><a href="'+esc(link)+'" target="_blank" rel="noopener">'+esc(link)+'</a></div><button class="btn sm" id="vCopy" data-link="'+esc(link)+'">Copiar ligazón</button></div></div></div>';
-      h+='<p><b>'+st.total+'</b> votos na urna</p>';
-      h+='<div class="row"><button class="btn pri" id="vClose">Pechar agora</button>'+
-        (st.estado==='programada'?'<button class="btn" id="vOpenNow">Abrir agora</button>':'')+
-        '<button class="btn" data-plus="2">+2 min</button><button class="btn" data-plus="5">+5 min</button>'+
-        (st.pecha_a?'<button class="btn" id="vNoAuto">Quitar peche automático</button>':'')+'</div>';
-      h+='<label class="row small" style="margin-top:.6rem"><input type="checkbox" id="vPubNow"'+(st.res_publicos?' checked':'')+'> Amosar os resultados a quen vota cando se peche</label>';
-      h+='<p class="small muted">Cada dispositivo só pode votar unha vez. Non se piden nomes e ninguén, tampouco ti, ve que votou cada quen. Os resultados aparecen ao pechar.</p>';
-    }else if(st.ronda>0){
-      h+='<h3>Resultados da ronda '+st.ronda+'</h3>'+resultsHTML(st.opcions,st.conta)+'<p class="small muted">'+st.total+' votos. '+(st.res_publicos?'Quen votou tamén os ve.':'Só os ves ti.')+'</p>';
-      h+='<div class="row"><button class="btn" id="vReopen">Reabrir esta votación</button></div>';
+  const box=$('voteBox');
+  if(box){
+    if(!CFG){box.innerHTML='<p class="small muted">Votar desde os móbiles (QR ou ligazón) precisa da versión publicada no teu Vercel con Supabase; o README do paquete explica como. Mentres tanto, usa o reconto a man.</p>'}
+    else if(!adminKey()){box.innerHTML='<p class="small">Para abrir, pechar e axustar votacións, entra coa clave de administración.</p><button class="btn pri" id="vLogin">Entrar como administración</button>'+(vmsg?'<p class="small note">'+esc(vmsg)+'</p>':'')}
+    else{
+      const st=vs,ES={aberta:'aberta',programada:'programada',pechada:'pechada'};
+      const has=!!(st&&st.ronda>0&&st.opcions&&st.opcions.length);
+      let h='<div class="row" style="justify-content:space-between"><span class="small">'+(st?('<b>'+(has?'Ronda '+st.ronda:'Sen votacións')+'</b>'+(has?' · '+ES[st.estado]:'')):'Cargando…')+'</span><span class="row"><button class="btn sm" id="vRefresh">Actualizar</button><button class="btn sm" id="vLogout">Saír</button></span></div>';
+      if(st){
+        const active=has&&(st.estado==='aberta'||st.estado==='programada');
+        if(active){
+          const link=voteLink(st);
+          h+='<div class="panel" style="margin:.8rem 0">'+
+            (st.estado==='programada'?'<p style="margin:0"><b>Abre o '+fmtDT(st.abre_a)+'</b> (en <span data-until="'+esc(st.abre_a)+'">…</span>)</p>':'<p style="margin:0"><b>Votación aberta</b></p>')+
+            '<p class="small" style="margin:.2rem 0">'+(st.pecha_a?'Pecha o <b>'+fmtDT(st.pecha_a)+'</b> (quedan <span data-until="'+esc(st.pecha_a)+'">…</span>)':'Sen peche automático: péchase a man.')+'</p>'+
+            '<div class="row" style="margin:.4rem 0"><span class="small muted">Código</span> <span class="pinbig" style="font-size:1.5rem">'+esc(st.pin)+'</span></div>'+
+            '<div class="small" style="overflow-wrap:anywhere;margin:.3rem 0"><a href="'+esc(link)+'" target="_blank" rel="noopener">'+esc(link)+'</a></div>'+
+            '<div class="row"><button class="btn pri sm" id="vQR">Amosar o QR grande</button><button class="btn sm" id="vCopy" data-link="'+esc(link)+'">Copiar ligazón</button></div></div>';
+          h+='<p><b>'+st.total+'</b> votos na urna</p>';
+          h+='<div class="row"><button class="btn pri" id="vClose">Pechar agora</button>'+
+            (st.estado==='programada'?'<button class="btn" id="vOpenNow">Abrir agora</button>':'')+
+            '<button class="btn" data-plus="2">+2 min</button><button class="btn" data-plus="5">+5 min</button>'+
+            (st.pecha_a?'<button class="btn" id="vNoAuto">Quitar peche automático</button>':'')+'</div>';
+          h+='<label class="row small" style="margin-top:.6rem"><input type="checkbox" id="vPubNow"'+(st.res_publicos?' checked':'')+'> Amosar os resultados a quen vota cando se peche</label>';
+          h+='<label class="row small"><input type="checkbox" id="vBoton"'+(st.boton?' checked':'')+'> Amosar o botón «Votar» a quen está vendo o calendario</label>';
+          h+='<p class="small muted">Cada dispositivo só pode votar unha vez. Non se piden nomes e ninguén, tampouco ti, ve que votou cada quen. Os resultados aparecen ao pechar.</p>';
+          h+='<div class="row"><button class="btn sm" id="vDelete">Borrar esta votación</button></div>';
+        }else if(has){
+          h+='<h3>Resultados da ronda '+st.ronda+'</h3>'+resultsHTML(st.opcions,st.conta)+'<p class="small muted">'+st.total+' votos. '+(st.res_publicos?'Quen votou tamén os ve.':'Só os ves ti.')+'</p>';
+          h+='<div class="row"><button class="btn" id="vReopen">Reabrir esta votación</button><button class="btn" id="vDelete">Borrar esta votación</button></div>';
+        }
+        if(!active)h+=voteForm();
+      }
+      if(vmsg)h+='<p class="small note">'+esc(vmsg)+'</p>';
+      box.innerHTML=h;
+      tickCountdowns();
     }
-    if(!active)h+=voteForm();
   }
-  if(vmsg)h+='<p class="small note">'+esc(vmsg)+'</p>';
-  box.innerHTML=h;
-  if(st&&(st.estado==='aberta'||st.estado==='programada')&&window.QRCode&&$('qr')){try{$('qr').innerHTML='';new QRCode($('qr'),{text:location.origin+location.pathname+'?votar=1&k='+st.pin,width:150,height:150})}catch(e){}}
+  renderQR();
+}
+/* Apartado do QR (grande e claro) */
+let qrFullOpen=false;
+function makeQR(el,text,size){
+  el.innerHTML='';
+  if(window.QRCode){try{new QRCode(el,{text:text,width:size,height:size,correctLevel:QRCode.CorrectLevel.M});return}catch(e){}}
+  el.innerHTML='<span class="small muted" style="line-height:1.4">Non se puido debuxar o QR: usa a ligazón.</span>';
+}
+function qrActive(){const st=vs;return !!(st&&st.ronda>0&&st.opcions&&st.opcions.length&&(st.estado==='aberta'||st.estado==='programada'))}
+function qrState(st){return (st.estado==='programada'?'<p><b>Abre o '+fmtDT(st.abre_a)+'</b> (en <span data-until="'+esc(st.abre_a)+'">…</span>)</p>':'')+(st.pecha_a?'<p class="small">Pecha o <b>'+fmtDT(st.pecha_a)+'</b> · quedan <b data-until="'+esc(st.pecha_a)+'">…</b></p>':'')}
+function renderQR(){
+  const p=$('qrPanel');
+  if(p){
+    if(!CFG)p.innerHTML='<h2>Código QR</h2><p class="muted">O QR de votación só existe na versión con servidor.</p>';
+    else if(!adminKey())p.innerHTML='<h2>Código QR</h2><p>Entra coa clave para ver o QR da votación.</p><button class="btn pri" id="qLogin">Entrar como administración</button>';
+    else if(!qrActive())p.innerHTML='<h2>Código QR</h2><p class="muted">Non hai ningunha votación aberta ou programada. Crea unha en «Propostas e votación» e o QR aparecerá aquí.</p>';
+    else{
+      const st=vs,link=voteLink(st);
+      p.innerHTML='<h2>Escanea para votar</h2>'+qrState(st)+'<div id="qrBig" class="qrbox"></div><div class="pinbig">'+esc(st.pin)+'</div><div class="qrlink">'+esc(link)+'</div><div class="row" style="justify-content:center"><button class="btn pri" id="qFull">Pantalla completa</button><button class="btn" id="qCopy" data-link="'+esc(link)+'">Copiar ligazón</button></div><p><b>'+st.total+'</b> votos</p>';
+      makeQR($('qrBig'),link,320);
+      tickCountdowns();
+    }
+  }
+  drawQRFull();
+}
+function drawQRFull(){
+  const f=$('qrFull');if(!f)return;
+  if(!qrFullOpen||!qrActive()){f.hidden=true;qrFullOpen=false;return}
+  const st=vs,link=voteLink(st);
+  f.hidden=false;
+  if(f.dataset.link!==link){f.dataset.link=link;f.innerHTML='<h2>Escanea para votar</h2><div id="qrHuge" class="qrbox"></div><div class="pinbig" id="qrPin"></div><div class="qrlink" id="qrLnk"></div><div id="qrInfo"></div><div class="small" style="opacity:.7">Toca en calquera sitio para pechar</div>';makeQR($('qrHuge'),link,560)}
+  $('qrPin').textContent=st.pin;$('qrLnk').textContent=link;
+  $('qrInfo').innerHTML=qrState(st)+'<p style="margin:0"><b>'+st.total+'</b> votos</p>';
   tickCountdowns();
 }
+$('qrFull').onclick=()=>{qrFullOpen=false;$('qrFull').hidden=true};
+$('t-qr').addEventListener('click',async e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.id==='qLogin'){if(askKey())loadVote()}
+  if(b.id==='qFull'){qrFullOpen=true;drawQRFull()}
+  if(b.id==='qCopy'){try{await navigator.clipboard.writeText(b.dataset.link);toast('Ligazón copiada.')}catch(x){toast('Copia a ligazón a man.')}}
+});
 async function vCall(fn,args){
   try{await rpc(fn,Object.assign({p_clave:adminKey()},args||{}));vmsg=''}
   catch(x){vmsg=errMsg(x);if(/clave_incorrecta/.test((x&&x.message)||''))setKey('')}
@@ -1229,16 +1290,22 @@ $('voteBox').addEventListener('click',async e=>{
     const ops=S.props.map((d,i)=>d?{l:LET[i],d:d}:null).filter(Boolean);
     if(vf.abre==='prog'&&!vf.abreAt){toast('Pon a hora de apertura.');return}
     if(vf.pecha==='prog'&&!vf.pechaAt){toast('Pon a hora de peche.');return}
-    await vCall('ccc_admin_abrir',{
-      p_opcions:ops,
-      p_abre_a:vf.abre==='prog'?new Date(vf.abreAt).toISOString():null,
-      p_pecha_a:vf.pecha==='prog'?new Date(vf.pechaAt).toISOString():null,
-      p_minutos:vf.pecha==='min'?(parseInt(vf.min,10)||null):null,
-      p_res_publicos:!!vf.pub
-    });
+    try{
+      await rpc('ccc_admin_abrir',{p_clave:adminKey(),
+        p_opcions:ops,
+        p_abre_a:vf.abre==='prog'?new Date(vf.abreAt).toISOString():null,
+        p_pecha_a:vf.pecha==='prog'?new Date(vf.pechaAt).toISOString():null,
+        p_minutos:vf.pecha==='min'?(parseInt(vf.min,10)||null):null,
+        p_res_publicos:!!vf.pub});
+      await rpc('ccc_admin_boton',{p_clave:adminKey(),p_activo:!!vf.boton});
+      vmsg='';
+    }catch(x){vmsg=errMsg(x);if(/clave_incorrecta/.test((x&&x.message)||''))setKey('')}
+    await loadVote();
   }
   if(b.id==='vClose'){if(confirm('Pechar a votación agora?'))await vCall('ccc_admin_pechar')}
   if(b.id==='vReopen')await vCall('ccc_admin_reabrir');
+  if(b.id==='vDelete'){if(confirm('Borrar a votación e todos os seus votos? Non se pode desfacer.'))await vCall('ccc_admin_borrar')}
+  if(b.id==='vQR'){qrFullOpen=false;document.querySelectorAll('nav.tabs button').forEach(x=>{if(x.dataset.t==='qr')x.click()})}
   if(b.id==='vOpenNow')await vCall('ccc_admin_axustar',{p_minutos:null,p_quitar_pecha:false,p_res_publicos:null,p_abrir_agora:true});
   if(b.id==='vNoAuto')await vCall('ccc_admin_axustar',{p_minutos:null,p_quitar_pecha:true,p_res_publicos:null,p_abrir_agora:false});
   if(b.dataset.plus)await vCall('ccc_admin_axustar',{p_minutos:+b.dataset.plus,p_quitar_pecha:false,p_res_publicos:null,p_abrir_agora:false});
@@ -1251,6 +1318,8 @@ $('voteBox').addEventListener('change',async e=>{
   else if(t.id==='vPechaAt')vf.pechaAt=t.value;
   else if(t.id==='vMin')vf.min=t.value;
   else if(t.id==='vPub')vf.pub=t.checked;
+  else if(t.id==='vBotonF')vf.boton=t.checked;
+  else if(t.id==='vBoton')await vCall('ccc_admin_boton',{p_activo:!!t.checked});
   else if(t.id==='vPubNow')await vCall('ccc_admin_axustar',{p_minutos:null,p_quitar_pecha:false,p_res_publicos:!!t.checked,p_abrir_agora:false});
 });
 let lastPoll=0;
@@ -1261,7 +1330,7 @@ setInterval(()=>{
   const active=vs.estado==='aberta'||vs.estado==='programada';
   if(!active)return;
   const edge=(vs.estado==='programada'&&vs.abre_a&&srvNow()>=Date.parse(vs.abre_a))||(vs.pecha_a&&srvNow()>=Date.parse(vs.pecha_a));
-  const tabOn=$('t-prop').classList.contains('on');
+  const tabOn=$('t-prop').classList.contains('on')||$('t-qr').classList.contains('on')||qrFullOpen;
   if((edge||tabOn)&&Date.now()-lastPoll>(edge?2500:5000)){lastPoll=Date.now();loadVote()}
 },1000);
 
@@ -1300,15 +1369,15 @@ function applyPublished(d){
 function renderPub(){
   const box=$('pubBox');if(!box)return;
   if(!CFG){box.innerHTML='<p class="small muted">Para que o profesorado consulte o calendario cunha ligazón (sen conta de Claude), publica a web no teu Vercel con Supabase. O README explica como.</p>';return}
-  const link=location.origin+location.pathname+'?ver=1';
-  box.innerHTML='<p class="small muted">Publica as datas actuais (inicio, festivos locais, avaliacións, exames e probas, día do centro) nunha ligazón só de lectura.</p><div class="row"><button class="btn pri sm" id="pubGo">Publicar para o profesorado</button><button class="btn sm" id="pubCopy">Copiar ligazón</button></div><div class="small" style="overflow-wrap:anywhere;margin-top:.4rem">'+esc(link)+'</div><p class="small" id="pubMsg"></p>';
+  const link=location.origin+location.pathname;
+  box.innerHTML='<p class="small muted">Publica as datas actuais (inicio, festivos locais, avaliacións, exames e probas, día do centro). O profesorado ve só o publicado, e a súa páxina actualízase soa cada minuto.</p><div class="row"><button class="btn pri sm" id="pubGo">Publicar para o profesorado</button><button class="btn sm" id="pubCopy">Copiar ligazón do profesorado</button></div><div class="small" style="overflow-wrap:anywhere;margin-top:.4rem">Profesorado: '+esc(link)+'<br>Administración (garda este enlace): '+esc(link+'?admin=1')+'</div><p class="small" id="pubMsg"></p>';
 }
 $('pubBox').addEventListener('click',async e=>{
   const b=e.target.closest('button');if(!b||!CFG)return;
-  if(b.id==='pubCopy'){try{await navigator.clipboard.writeText(location.origin+location.pathname+'?ver=1');toast('Ligazón copiada.')}catch(x){toast('Copia a ligazón a man.')}}
+  if(b.id==='pubCopy'){try{await navigator.clipboard.writeText(location.origin+location.pathname);toast('Ligazón do profesorado copiada.')}catch(x){toast('Copia a ligazón a man.')}}
   if(b.id==='pubGo'){
     if(!adminKey()&&!askKey())return;
-    try{await rpc('ccc_admin_publicar',{p_clave:adminKey(),p_datos:pubData()});$('pubMsg').textContent='Publicado. O profesorado xa ve estas datas.'}
+    try{await rpc('ccc_admin_publicar',{p_clave:adminKey(),p_datos:pubData()});$('pubMsg').textContent='Publicado. O profesorado verá estas datas en menos dun minuto.'}
     catch(x){$('pubMsg').textContent=errMsg(x);if(/clave_incorrecta/.test((x&&x.message)||''))setKey('')}
   }
 });
@@ -1337,7 +1406,7 @@ async function initVoter(){
   if(!CFG){say('<h1>Votación</h1><p class="muted">A votación non está configurada nesta páxina.</p>');return}
   say('<h1>Votación</h1><p class="muted">Cargando…</p>');
   try{const pd=await rpc('ccc_publicado');if(pd)applyPublished(pd)}catch(e){}
-  const dev=deviceId(),calLink='<p class="small"><a href="?ver=1">Ver o calendario</a></p>';
+  const dev=deviceId(),calLink='<p class="small"><a href="./">Ver o calendario</a></p>';
   let st=null,lastKey='',sel='',busy=false;
   async function draw(){
     const doneKey='voto-ronda-'+st.ronda;let done=false;try{done=!!localStorage.getItem(doneKey)}catch(e){}
@@ -1352,11 +1421,11 @@ async function initVoter(){
         if(info(o.d).t==='lect'){const e=effect(o.d);eff='Descanso de '+e.rest+' días · '+WD[e.wi]+' '+e.before+' → '+e.after}
         return '<button class="vopt" data-vote="'+o.l+'" style="--o:'+OCOL[i]+'" aria-pressed="false"><span class="small">Proposta '+o.l+'</span><b>'+esc(cap(fmtL(o.d)))+'</b><span class="small">'+esc(eff)+'</span></button>';
       }).join('');
-      say('<h1>Votación</h1><p>Día non lectivo do centro · curso 2026-27</p>'+closing+'<h3>Escolle unha opción</h3><div class="vopts">'+opts+'<button class="vopt" data-vote="X" style="--o:var(--muted)" aria-pressed="false"><span class="small">Abstención</span><b>Non voto</b></button></div><button class="btn pri" id="vSend" disabled style="width:100%;padding:.8rem">Votar</button><p class="small note" id="vMsg" hidden></p><p class="small muted">Non se che pide o nome. Cada dispositivo pode votar unha vez, e o voto gárdase sen identificación: nin quen organiza sabe o que votaches.</p>'+calLink);
+      say('<h1>Votación</h1><p>Día non lectivo do centro · curso 2026-27</p>'+closing+'<h3>Escolle unha opción</h3><div class="vopts">'+opts+'<button class="vopt" data-vote="X" style="--o:var(--muted)" aria-pressed="false"><span class="small">Abstención</span><b>Non voto</b></button></div><button class="btn pri" id="vSend" disabled style="width:100%;padding:.8rem">Votar</button><p class="small note" id="vMsg" hidden></p><p class="small muted">Só podes votar unha vez desde este dispositivo, e o voto non se pode cambiar despois de enviado. O teu voto é anónimo: ninguén, nin sequera quen organiza a votación, pode saber que opción escolliches.</p>'+calLink);
       sel='';return;
     }
     let h='<h1>Votación</h1><p>A votación non está aberta agora.</p>';
-    if(st.ronda>0&&st.res_publicos){try{const r=await rpc('ccc_resultados');if(r)h+='<h3>Resultados</h3>'+resultsHTML(st.opcions,r.conta)}catch(e){}}
+    if(st.ronda>0&&(st.opcions||[]).length&&st.res_publicos){try{const r=await rpc('ccc_resultados');if(r)h+='<h3>Resultados</h3>'+resultsHTML(st.opcions,r.conta)}catch(e){}}
     say(h+calLink);
   }
   async function refresh(){
@@ -1389,6 +1458,19 @@ async function initVoter(){
   setInterval(tickCountdowns,1000);
 }
 
+/* Aviso «Votar» para quen ve o calendario */
+let banSt=null;
+function renderBanner(){
+  const el=$('voteBanner');if(!el)return;
+  const st=banSt;
+  if(!st||!st.pin||!(st.opcions||[]).length||!(st.estado==='aberta'||st.estado==='programada')){el.hidden=true;return}
+  const sub=st.estado==='programada'?'Abre o '+fmtDT(st.abre_a)+' (en <b data-until="'+esc(st.abre_a)+'">…</b>)':(st.pecha_a?'Pecha en <b data-until="'+esc(st.pecha_a)+'">…</b>':'Vota unha vez desde este dispositivo.');
+  el.hidden=false;
+  el.innerHTML='<div><b>Votación aberta: día non lectivo do centro</b><div class="small muted">'+sub+'</div></div><a class="btn pri" href="?votar=1&k='+encodeURIComponent(st.pin)+'">'+(st.estado==='programada'?'Ver a votación':'Votar')+'</a>';
+  tickCountdowns();
+}
+async function pollBanner(){try{banSt=await rpc('ccc_estado');if(banSt&&banSt.agora)srvOff=Date.parse(banSt.agora)-Date.now()}catch(e){return}renderBanner()}
+
 /* ================= Arranque ================= */
 if(RO)document.body.classList.add('ro');
 if(MODE==='voto'){initVoter()}
@@ -1396,7 +1478,13 @@ else{
   if(RO){$('hdrP').textContent='Datas do curso 2026-27 para o profesorado: días lectivos, festivos, avaliacións, exames e probas.'}
   ensureEval();renderAll();
   if(CFG&&!RO){if($('bkPanel'))$('bkPanel').hidden=true;setSync(adminKey()?'conectando…':'sen conectar');if(adminKey())startSync()}
-  if(MODE==='ver'&&CFG){rpc('ccc_publicado').then(d=>{if(d){applyPublished(d);S.e1=S.e1||'';ensureEval();renderAll()}}).catch(()=>{})}
+  if(MODE==='ver'&&CFG){
+    let lastPub='';
+    const pollPub=async()=>{try{const d=await rpc('ccc_publicado');const s=JSON.stringify(d||null);if(s!==lastPub){lastPub=s;if(d){applyPublished(d);ensureEval();renderAll()}}}catch(e){}};
+    pollPub();pollBanner();
+    setInterval(pollPub,60000);setInterval(pollBanner,10000);setInterval(tickCountdowns,1000);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden){pollPub();pollBanner()}});
+  }
 }
 })();
 </script>

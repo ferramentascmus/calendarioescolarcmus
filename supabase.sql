@@ -2,7 +2,7 @@
 --  Calendario do curso 2026-27 · votación anónima (un voto por dispositivo)
 --  e versión do profesorado.
 --
---  TODO o que crea este script empeza por  ccc_  (3 táboas e 15 funcións),
+--  TODO o que crea este script empeza por  ccc_  (3 táboas e 17 funcións),
 --  para que non choque con nada que xa teñas no proxecto de Supabase.
 --  Non modifica nin borra nada que non empece por ccc_.
 --
@@ -25,11 +25,13 @@ create table if not exists public.ccc_config (
   pecha_a       timestamptz,
   pechada_man   boolean not null default true,
   res_publicos  boolean not null default true,
+  boton_calendario boolean not null default true,
   barallada     boolean not null default false
 );
 
 -- Se xa tiñas as táboas ccc_ dunha execución anterior, isto engade só a columna nova.
 alter table public.ccc_config add column if not exists borrador jsonb;
+alter table public.ccc_config add column if not exists boton_calendario boolean not null default true;
 
 -- Un rexistro por dispositivo e ronda: só di "este dispositivo xa votou". Sen nome.
 create table if not exists public.ccc_dispositivos (
@@ -50,6 +52,9 @@ alter table public.ccc_urna         enable row level security;
 revoke all on public.ccc_config, public.ccc_dispositivos, public.ccc_urna from anon, authenticated;
 
 -- ---------- CLAVE DE ADMINISTRACIÓN (cámbiaa aquí) ----------
+-- OJO: só se garda a PRIMEIRA vez que se executa o script (on conflict do nothing, para non pisar a túa clave
+-- ao volver executalo). Se a primeira vez a deixaches como CAMBIA_ESTA_CLAVE, ou queres cambiala despois, usa o
+-- comando de "Cambiar a clave" que hai ao final deste ficheiro.
 insert into public.ccc_config (id, clave_hash)
 values (1, extensions.crypt('CAMBIA_ESTA_CLAVE', extensions.gen_salt('bf')))
 on conflict (id) do nothing;
@@ -96,8 +101,11 @@ declare c ccc_config%rowtype;
 begin
   perform public.ccc_baralla();
   select * into c from ccc_config where id = 1;
+  -- O código (pin) só se amosa a quen ve o calendario se o administrador deixa o botón «Votar» activado.
   return jsonb_build_object('ronda', c.ronda, 'estado', public.ccc_ef(c), 'opcions', c.opcions,
-                            'abre_a', c.abre_a, 'pecha_a', c.pecha_a, 'agora', now(), 'res_publicos', c.res_publicos);
+                            'abre_a', c.abre_a, 'pecha_a', c.pecha_a, 'agora', now(), 'res_publicos', c.res_publicos,
+                            'pin', case when c.boton_calendario and jsonb_array_length(c.opcions) > 0
+                                          and public.ccc_ef(c) in ('aberta', 'programada') then c.pin else null end);
 end $$;
 
 create or replace function public.ccc_resultados() returns jsonb
@@ -106,7 +114,7 @@ declare c ccc_config%rowtype;
 begin
   perform public.ccc_baralla();
   select * into c from ccc_config where id = 1;
-  if c.ronda = 0 or public.ccc_ef(c) <> 'pechada' or not c.res_publicos then return null; end if;
+  if c.ronda = 0 or jsonb_array_length(c.opcions) = 0 or public.ccc_ef(c) <> 'pechada' or not c.res_publicos then return null; end if;
   return jsonb_build_object('ronda', c.ronda,
     'conta', coalesce((select jsonb_object_agg(t.opcion, t.n)
                        from (select opcion, count(*) as n from ccc_urna where ronda = c.ronda group by opcion) t), '{}'::jsonb));
@@ -146,9 +154,9 @@ begin
   v_ef := public.ccc_ef(c);
   return jsonb_build_object(
     'ronda', c.ronda, 'estado', v_ef, 'pin', c.pin, 'opcions', c.opcions,
-    'abre_a', c.abre_a, 'pecha_a', c.pecha_a, 'agora', now(), 'res_publicos', c.res_publicos,
+    'abre_a', c.abre_a, 'pecha_a', c.pecha_a, 'agora', now(), 'res_publicos', c.res_publicos, 'boton', c.boton_calendario,
     'total', (select count(*) from ccc_urna where ronda = c.ronda),
-    'conta', case when v_ef = 'pechada' and c.ronda > 0
+    'conta', case when v_ef = 'pechada' and c.ronda > 0 and jsonb_array_length(c.opcions) > 0
                   then coalesce((select jsonb_object_agg(t.opcion, t.n)
                                  from (select opcion, count(*) as n from ccc_urna where ronda = c.ronda group by opcion) t), '{}'::jsonb)
                   else null end
@@ -197,7 +205,7 @@ begin
   update ccc_config set pechada_man = false, barallada = false,
          pecha_a = case when pecha_a is not null and pecha_a <= now() then null else pecha_a end,
          abre_a  = case when abre_a  is not null and abre_a  >  now() then abre_a else null end
-  where id = 1 and ronda > 0;
+  where id = 1 and ronda > 0 and jsonb_array_length(opcions) > 0;
 end $$;
 
 -- Axustes sobre a marcha: estender o peche, quitar o peche automático, abrir agora, resultados públicos.
@@ -215,6 +223,27 @@ begin
     where id = 1 and ronda > 0;
   end if;
   if p_res_publicos is not null then update ccc_config set res_publicos = p_res_publicos where id = 1; end if;
+end $$;
+
+-- Amosar (ou non) o botón «Votar» a quen está vendo o calendario.
+create or replace function public.ccc_admin_boton(p_clave text, p_activo boolean) returns void
+language plpgsql security definer set search_path = public, extensions as $$
+begin
+  perform public.ccc_admin(p_clave);
+  update ccc_config set boton_calendario = coalesce(p_activo, true) where id = 1;
+end $$;
+
+-- Borrar a votación: elimina TODOS os votos e os rexistros de dispositivo, e deixa a votación como inexistente.
+-- (O número de ronda non se reinicia, así que os navegadores que xa votaran non quedan bloqueados nas seguintes.)
+create or replace function public.ccc_admin_borrar(p_clave text) returns void
+language plpgsql security definer set search_path = public, extensions as $$
+begin
+  perform public.ccc_admin(p_clave);
+  perform 1 from ccc_config where id = 1 for update;
+  delete from ccc_urna where ronda >= 0;
+  delete from ccc_dispositivos where ronda >= 0;
+  update ccc_config set opcions = '[]'::jsonb, pin = null, abre_a = null, pecha_a = null,
+                        pechada_man = true, barallada = true where id = 1;
 end $$;
 
 create or replace function public.ccc_admin_publicar(p_clave text, p_datos jsonb) returns void
@@ -253,6 +282,8 @@ grant execute on function public.ccc_admin_reabrir(text)                        
 grant execute on function public.ccc_admin_axustar(text, int, boolean, boolean, boolean)       to anon, authenticated;
 grant execute on function public.ccc_admin_ler(text)                                          to anon, authenticated;
 grant execute on function public.ccc_admin_gardar(text, jsonb)                                 to anon, authenticated;
+grant execute on function public.ccc_admin_boton(text, boolean)                                to anon, authenticated;
+grant execute on function public.ccc_admin_borrar(text)                                        to anon, authenticated;
 grant execute on function public.ccc_admin_publicar(text, jsonb)                               to anon, authenticated;
 
 -- ---------------------------------------------------------------------
@@ -266,3 +297,11 @@ grant execute on function public.ccc_admin_publicar(text, jsonb)                
 --   public.cal_admin_publicar(text,jsonb), public.cal_admin(text), public.cal_baralla(), public.cal_nomes(text),
 --   public.cal_admin_abrir(text,jsonb,timestamptz,timestamptz,int,boolean), public.cal_admin_abrir(text,jsonb,text[]);
 -- drop table if exists public.cal_urna, public.cal_dispositivos, public.cal_votantes, public.cal_config;
+
+-- ---------------------------------------------------------------------
+--  Cambiar a clave de administración (executa SÓ esta liña, coa túa clave nova entre as comiñas)
+-- ---------------------------------------------------------------------
+-- update public.ccc_config set clave_hash = extensions.crypt('A_TUA_CLAVE_NOVA', extensions.gen_salt('bf')) where id = 1;
+
+--  Comprobar se unha clave é a gardada (devolve true ou false):
+-- select clave_hash = extensions.crypt('A_CLAVE_QUE_PROBAS', clave_hash) as coincide from public.ccc_config where id = 1;
