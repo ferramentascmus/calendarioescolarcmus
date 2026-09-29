@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="gl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calendario do curso 2026-27</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --paper:#EEF1F5; --card:#FFFFFF; --ink:#111B2E; --muted:#56637A; --line:#CBD3DF; --we:#DCE1E9;
+  --fest:#C62828; --local:#B85400; --local2:#D96A00; --vac:#00796B; --ens:#1565C0; --cen:#6A1B9A; --ext:#455A64;
+  --e1:#1E6FD9; --e2:#1F9D55; --e3:#D6336C; --e4:#A67C00;
+  --o1:#B5179E; --o2:#0077B6; --o3:#C77700; --o4:#2E7D32; --o5:#A0522D; --o6:#00897B; --o7:#5E35B1; --o8:#546E7A;
+  --c-ex:#F2C200; --c-se:#0B0B0B; --c-rc:#00B8D9; --c-ac:#7CB518; --c-xt:#8D5A2B;
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible","Segoe UI",Roboto,system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1524; --card:#1A2438; --ink:#F0F4FA; --muted:#A3AFC4; --line:#33415C; --we:#0A101C;
+    --fest:#D32F2F; --local:#C25E00; --local2:#E07A10; --vac:#00897B; --ens:#1E88E5; --cen:#8E24AA; --ext:#607D8B;
+    --e1:#5AA2FF; --e2:#4FD18B; --e3:#FF7BAA; --e4:#E5C15D;
+    --o1:#E060D0; --o2:#4FB3F0; --o3:#F0A830; --o4:#5FD068; --o5:#D98A62; --o6:#4DD0BF; --o7:#A58BFF; --o8:#90A4AE;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1524; --card:#1A2438; --ink:#F0F4FA; --muted:#A3AFC4; --line:#33415C; --we:#0A101C;
+  --fest:#D32F2F; --local:#C25E00; --local2:#E07A10; --vac:#00897B; --ens:#1E88E5; --cen:#8E24AA; --ext:#607D8B;
+  --e1:#5AA2FF; --e2:#4FD18B; --e3:#FF7BAA; --e4:#E5C15D;
+  --o1:#E060D0; --o2:#4FB3F0; --o3:#F0A830; --o4:#5FD068; --o5:#D98A62; --o6:#4DD0BF; --o7:#A58BFF; --o8:#90A4AE;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);font-size:16px;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:1rem/1.5 var(--body)}
+.wrap{max-width:1500px;margin:0 auto;padding:0 1rem 6rem}
+header{padding:1.2rem 0 .4rem;display:flex;gap:1rem;justify-content:space-between;align-items:flex-end;flex-wrap:wrap}
+h1{font:800 clamp(2rem,6vw,3.4rem)/1 var(--display);margin:0;letter-spacing:-.02em}
+header p{margin:.4rem 0 0;color:var(--muted);max-width:60ch}
+h2{font:800 1.35rem/1.2 var(--display);margin:0 0 .6rem}
+h3{font:800 1.05rem/1.3 var(--display);margin:1.1rem 0 .4rem}
+a{color:var(--ens)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--ens);outline-offset:2px}
+.muted{color:var(--muted)} .small{font-size:.88rem}
+.row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:.6rem;padding:.5rem .8rem}
+.btn.pri{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.sm{padding:.3rem .65rem;font-size:.88rem}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:.6rem;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:transparent;padding:.45rem .8rem;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper);font-weight:700}
+body.ro .edit{display:none!important}
+
+/* Contador fixo */
+.counter{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding:.5rem 0;border-bottom:1px solid var(--line)}
+.counter-in{display:grid;grid-template-columns:auto repeat(5,minmax(0,1fr));gap:.4rem;align-items:stretch}
+.tot{padding:.2rem .8rem .2rem 0;border-right:1px solid var(--line);margin-right:.2rem}
+.tot b{display:block;font:800 2.1rem/1 var(--display)}
+.tot span{font-size:.8rem;color:var(--muted);display:block;max-width:11rem}
+.wd{background:var(--card);border:2px solid var(--line);border-radius:.7rem;padding:.3rem .2rem .45rem;text-align:center;position:relative;overflow:hidden;min-width:0}
+.wd .n{font:800 1.6rem/1 var(--display)} .wd .l{font-size:.8rem;color:var(--muted)}
+.wd .bar{position:absolute;left:0;bottom:0;height:5px;background:var(--ink);opacity:.3}
+.wd.max{border-color:var(--fest)} .wd.max .bar{background:var(--fest);opacity:1}
+.wd.min{border-color:var(--vac)} .wd.min .bar{background:var(--vac);opacity:1}
+
+nav.tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.7rem 0 .2rem;scrollbar-width:none}
+nav.tabs button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:.4rem .9rem;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink);font-weight:700}
+section.tab{display:none;padding-top:.7rem} section.tab.on{display:block}
+.bar-tools{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-bottom:.8rem}
+.toolrow{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:.8rem;padding:.5rem .7rem;margin-bottom:.8rem}
+.toolrow select{min-width:0;max-width:100%;flex:1 1 16rem}
+.toolrow .hint{flex:1 1 100%;font-size:.88rem;color:var(--muted)}
+.toolrow.on{border-color:var(--cen);box-shadow:inset 0 0 0 2px var(--cen)}
+
+/* Lenda */
+.legend{display:flex;flex-wrap:wrap;gap:.35rem 1rem;font-size:.92rem;margin:.2rem 0 .9rem}
+.legend span{display:inline-flex;align-items:center;gap:.4rem}
+.sw{display:inline-block;width:1.15rem;height:1.15rem;border-radius:.3rem;border:1px solid var(--line)}
+.sw.lect{background:var(--lect,var(--card))} .sw.fest{background:var(--fest)} .sw.vac{background:var(--vac)} .sw.ens{background:var(--ens)}
+.sw.cen{background:var(--cen)} .sw.ext{background:var(--ext)} .sw.we{background:var(--we)}
+.sw.local{background:repeating-linear-gradient(135deg,var(--local) 0 4px,var(--local2) 4px 8px)}
+.sw.act{background:repeating-linear-gradient(45deg,var(--act,var(--we)) 0 4px,var(--card) 4px 8px)}
+.sw.ev{height:.4rem;border-radius:2px;border:0}
+
+.sum{background:var(--card);border:1px solid var(--line);border-radius:.9rem;padding:.7rem 1rem;margin-bottom:.9rem;display:flex;flex-wrap:wrap;gap:.3rem 1.4rem;align-items:baseline}
+.sum b{font:800 1.3rem var(--display)}
+
+/* Grella */
+.months{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(min(17.5rem,100%),1fr))}
+.months.m4{grid-template-columns:repeat(auto-fit,minmax(min(20rem,100%),1fr))}
+.months.m1{grid-template-columns:minmax(0,46rem);justify-content:center}
+.month{background:var(--card);border:1px solid var(--line);border-radius:.9rem;padding:.7rem;min-width:0}
+.mh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.4rem}
+.mh b{font:800 1.15rem var(--display)} .mh span{font-size:.85rem;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr)) repeat(2,minmax(0,.8fr));gap:.22rem}
+.dh{font-size:.75rem;color:var(--muted);text-align:center;padding-bottom:.1rem;min-width:0}
+.d{aspect-ratio:1/1;border:0;border-radius:.45rem;background:transparent;position:relative;font-size:.98rem;padding:0;display:flex;align-items:center;justify-content:center;min-width:0}
+.months.m1 .d{font-size:1.5rem}
+.d.lect{background:var(--lect,var(--card));color:var(--lect-t,var(--ink));font-weight:700;box-shadow:inset 0 0 0 1px var(--line)}
+.d.we{background:var(--we);color:var(--muted)}
+.d.out{background:transparent;color:var(--muted);opacity:.85}
+.d.act{background:repeating-linear-gradient(45deg,var(--act,var(--we)) 0 5px,var(--card) 5px 10px);color:var(--ink);font-weight:700;box-shadow:inset 0 0 0 1px var(--line)}
+.d.fest{background:var(--fest);color:var(--fest-t,#fff);font-weight:800}
+.d.local{background:repeating-linear-gradient(135deg,var(--local) 0 6px,var(--local2) 6px 12px);color:var(--local-t,#fff);font-weight:800}
+.d.vac{background:var(--vac);color:var(--vac-t,#fff)}
+.d.ens{background:var(--ens);color:var(--ens-t,#fff);font-weight:800}
+.d.cen{background:var(--cen);color:var(--cen-t,#fff);font-weight:800}
+.d.ext{background:var(--ext);color:var(--ext-t,#fff)}
+.d.fora{opacity:.25}
+.d.evend{box-shadow:inset 0 0 0 3px var(--ink)}
+.d.today{outline:3px dashed var(--muted);outline-offset:1px}
+.d .acb{position:absolute;left:0;right:0;top:0;height:.3rem;background:var(--ac);border-radius:.45rem .45rem 0 0;box-shadow:0 0 0 1px rgba(255,255,255,.6)}
+.d .acb.b2{top:.3rem;border-radius:0}
+.d .ev{position:absolute;left:14%;right:14%;bottom:2px;height:4px;border-radius:2px}
+.d .hit{position:absolute;top:3px;right:3px;width:.4rem;height:.4rem;border-radius:50%;background:currentColor}
+.d.pp{box-shadow:0 0 0 3px var(--o)}
+.d .pr{position:absolute;top:-.35rem;left:-.35rem;min-width:1.15rem;height:1.15rem;border-radius:.6rem;background:var(--o);color:#fff;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid var(--paper);z-index:1}
+.blank{aspect-ratio:1/1}
+
+/* Liña */
+.tw{overflow-x:auto}
+table.linea{border-collapse:separate;border-spacing:2px;width:100%;min-width:64rem;table-layout:fixed}
+table.linea th.lab{width:9.5rem;text-align:left;font:800 1rem var(--display);padding-right:.4rem;white-space:nowrap}
+table.linea th.lab small{display:block;font:400 .75rem var(--body);color:var(--muted)}
+table.linea th.n{font-size:.72rem;color:var(--muted);font-weight:400;text-align:center}
+table.linea td{padding:0}
+table.linea .d{aspect-ratio:auto;width:100%;height:2.7rem;flex-direction:column;font-size:.9rem;line-height:1.05;border-radius:.3rem}
+table.linea .d small{font-size:.58rem;font-weight:400;opacity:.85}
+table.linea .d .pr{top:-.4rem;left:-.3rem}
+
+/* Paneis */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:.9rem;padding:1rem;margin-bottom:.9rem;min-width:0}
+table.t{border-collapse:collapse;width:100%;font-size:.92rem}
+table.t th,table.t td{padding:.4rem .5rem;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+table.t th:first-child,table.t td:first-child{text-align:left}
+table.t th{font-weight:700;color:var(--muted);font-size:.8rem}
+.cand{display:grid;grid-template-columns:1fr auto;gap:.5rem;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--line)}
+.cand:last-child{border-bottom:0}
+.cand2{padding:.6rem 0;border-bottom:1px solid var(--line);display:grid;gap:.35rem}
+.cand2:last-child{border-bottom:0}
+.tag{display:inline-block;font-size:.78rem;padding:0 .5rem;border-radius:999px;background:var(--paper);border:1px solid var(--line);margin-left:.3rem}
+.dot{display:inline-block;width:.7rem;height:.7rem;border-radius:50%;margin-right:.4rem}
+.fld{display:flex;flex-direction:column;gap:.2rem;margin:.4rem 0}
+.fld label{font-size:.85rem;color:var(--muted)}
+input[type=date],input[type=text],select,textarea{border:1px solid var(--line);background:var(--paper);border-radius:.5rem;padding:.4rem .55rem;max-width:100%;min-width:0}
+textarea{width:100%}
+.lrow{display:grid;grid-template-columns:auto 1fr auto;gap:.4rem;margin-bottom:.4rem}
+ul.clean{list-style:none;padding:0;margin:0}
+ul.clean li{padding:.45rem 0;border-bottom:1px solid var(--line)}
+ul.clean li:last-child{border-bottom:0}
+.note{border-left:4px solid var(--local);padding:.5rem .8rem;background:var(--paper);border-radius:0 .6rem .6rem 0;margin:.6rem 0}
+.balance{height:.7rem;border-radius:.4rem;display:flex;overflow:hidden;margin:.4rem 0 .8rem}
+.arow{display:grid;grid-template-columns:1fr auto;gap:.6rem;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--line)}
+.arow:last-child{border-bottom:0}
+.warn{border-left:4px solid var(--fest);padding:.3rem .6rem;background:var(--paper);border-radius:0 .5rem .5rem 0;margin:.3rem 0;font-size:.85rem}
+
+/* Propostas */
+.slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(15rem,100%),1fr));gap:.8rem}
+.slot{border:3px solid var(--o);border-radius:1rem;padding:.8rem 1rem;background:var(--card);min-width:0}
+.slot .let{display:inline-flex;width:2.2rem;height:2.2rem;border-radius:50%;background:var(--o);color:#fff;font:800 1.3rem var(--display);align-items:center;justify-content:center;margin-right:.4rem}
+.slot .dt{font:800 1.15rem/1.2 var(--display);margin:.4rem 0 .2rem}
+.slot.empty{border-style:dashed}
+.slot ul{margin:.4rem 0 0;padding-left:1.1rem;font-size:.9rem}
+.vopts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(13rem,100%),1fr));gap:.7rem;margin:.6rem 0}
+.vopt{border:3px solid var(--o);background:var(--card);border-radius:1rem;padding:.8rem;text-align:left;min-width:0}
+.vopt[aria-pressed="true"]{background:var(--o);color:#fff}
+.vopt b{font:800 1.25rem var(--display);display:block;overflow-wrap:anywhere}
+.res{margin:.4rem 0}
+.res .rl{display:flex;justify-content:space-between;gap:.5rem;font-weight:700}
+.res .rb{height:1.4rem;background:var(--paper);border-radius:.4rem;overflow:hidden;border:1px solid var(--line)}
+.res .rb i{display:block;height:100%;background:var(--o)}
+.res.win .rl{font-size:1.1rem}
+.tally{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(8.5rem,100%),1fr));gap:.6rem}
+.tal{border:3px solid var(--o);border-radius:.9rem;padding:.5rem;text-align:center;background:var(--card);min-width:0}
+.tal .num{font:800 1.9rem/1 var(--display);display:block;color:var(--o)}
+.tal .tl{font-size:.82rem;overflow-wrap:anywhere;line-height:1.25;margin:.15rem 0 .3rem}
+.vwrap{max-width:34rem;margin:0 auto;padding:1rem 1rem 5rem}
+.vwrap h1{font-size:2rem}
+.crow{display:grid;grid-template-columns:auto 1fr auto;gap:.6rem;align-items:center;padding:.3rem 0}
+input[type=color]{width:2.6rem;height:2.2rem;padding:0;border:1px solid var(--line);border-radius:.4rem;background:none;cursor:pointer}
+.pinbig{font:800 2rem var(--display);letter-spacing:.1em}
+#qr canvas,#qr img{max-width:100%;height:auto}
+
+/* Folla inferior */
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -8px 30px rgba(0,0,0,.25);padding:.9rem 1rem calc(.9rem + env(safe-area-inset-bottom,0px));transform:translateY(110%);transition:transform .2s ease}
+.sheet.open{transform:none}
+.sheet-in{max-width:44rem;margin:0 auto}
+.sheet h3{margin:0 0 .1rem}
+.sheet .acts{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.8rem;max-height:45vh;overflow:auto}
+.sheet .acts .btn{text-align:left}
+.sheet .acts .btn.on{border-color:var(--cen);box-shadow:inset 0 0 0 2px var(--cen)}
+.toast{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:.5rem .9rem;border-radius:.6rem;z-index:30;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw}
+.toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){.sheet,.toast{transition:none}}
+
+body.proj header p,body.proj .noproj{display:none}
+body.proj .wrap{max-width:none;padding:0 1.2rem 5rem}
+body.proj h1{font-size:2.2rem}
+body.proj header{padding:.6rem 0 .2rem}
+body.proj .d{font-weight:800}
+body.proj .month{border-width:2px}
+
+@media (max-width:560px){
+  .wrap{padding:0 .5rem 5rem}
+  header{padding-top:.7rem}
+  .tot b{font-size:1.5rem} .wd .n{font-size:1.2rem} .wd .l{font-size:.72rem}
+  .tot span{display:none} .tot{padding-right:.5rem}
+  .months,.months.m4,.months.m1{grid-template-columns:minmax(0,1fr)}
+  .month{padding:.5rem}
+  .grid{gap:.18rem}
+  .sheet .acts{grid-template-columns:1fr}
+  .arow{grid-template-columns:1fr}
+  .panel{padding:.8rem}
+  .sum{padding:.5rem .7rem}
+}
+@media print{
+  .counter{position:static} nav.tabs,.sheet,.noprint,.bar-tools,.toolrow{display:none!important}
+  section.tab{display:block!important} body{background:#fff}
+  .month,.panel{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+<header>
+  <div>
+    <h1>Curso 2026-27</h1>
+    <p id="hdrP">Días lectivos en Galicia cos festivos da Coruña e os prazos dos conservatorios. Usa «Marcar no calendario» para poñer datas tocando os días.</p>
+  </div>
+  <div class="row noprint">
+    <button class="btn" id="projBtn" aria-pressed="false">Modo proxección</button>
+  </div>
+</header>
+
+<div class="counter" aria-live="polite"><div class="counter-in" id="counter"></div></div>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" data-t="cal" aria-selected="true">Calendario</button>
+  <button role="tab" class="edit" data-t="prop" aria-selected="false">Propostas e votación</button>
+  <button role="tab" data-t="exa" aria-selected="false">Exames e probas</button>
+  <button role="tab" data-t="ava" aria-selected="false">Avaliacións</button>
+  <button role="tab" class="edit" data-t="aju" aria-selected="false">Axustes</button>
+  <button role="tab" data-t="nor" aria-selected="false">Normativa</button>
+</nav>
+
+<section class="tab on" id="t-cal">
+  <div class="bar-tools noprint">
+    <div class="seg" role="group" aria-label="Tramo do curso" id="scopeSeg">
+      <button data-scope="curso">Curso</button>
+      <button data-scope="t1">1ª aval.</button>
+      <button data-scope="t2">2ª aval.</button>
+      <button data-scope="t3">3ª aval.</button>
+      <button data-scope="amp" id="scopeAmp">Ampliación</button>
+      <button data-scope="mes">Mes</button>
+    </div>
+    <span id="mesNav" class="row" hidden>
+      <button class="btn sm" id="mPrev" aria-label="Mes anterior">‹</button>
+      <select id="mSel" aria-label="Mes"></select>
+      <button class="btn sm" id="mNext" aria-label="Mes seguinte">›</button>
+    </span>
+    <div class="seg" role="group" aria-label="Disposición" id="layoutSeg">
+      <button data-layout="grella">Vertical</button>
+      <button data-layout="linea">Horizontal</button>
+    </div>
+    <div class="seg" role="group" aria-label="Tamaño">
+      <button id="zMinus" aria-label="Reducir tamaño">A−</button>
+      <button id="zPlus" aria-label="Aumentar tamaño">A+</button>
+    </div>
+    <button class="btn sm" id="themeBtn">Tema: automático</button>
+  </div>
+  <div class="toolrow edit noprint" id="toolRow">
+    <label for="tool"><b>Marcar no calendario</b></label>
+    <select id="tool" aria-label="Que marcar"></select>
+    <button class="btn sm" id="toolDone" hidden>Feito</button>
+    <div class="hint" id="toolHint"></div>
+  </div>
+  <div class="sum" id="sum"></div>
+  <div class="legend" id="legend"></div>
+  <div id="months"></div>
+</section>
+
+<section class="tab" id="t-prop">
+  <div class="panel" id="propPanel">
+    <h2>Propostas para o día non lectivo do centro</h2>
+    <p class="small muted" id="cenIntro"></p>
+    <div class="slots" id="slots"></div>
+    <div class="row noprint" style="margin-top:.7rem"><button class="btn sm" id="addSlot">Engadir outra proposta</button></div>
+    <div id="cenChosen" style="margin-top:.9rem"></div>
+  </div>
+  <div class="panel" id="candPanel">
+    <h2>Días que máis interesan</h2>
+    <p class="small muted">Apunta aquí os días que che vaian propoñendo. Podes editalos e, cando queiras, pasalos a proposta para votar.</p>
+    <div id="candList"></div>
+    <div class="row noprint" style="margin-top:.6rem"><button class="btn sm pri" id="addCand">Engadir día</button></div>
+    <h3>Suxestións automáticas</h3>
+    <p class="small muted">Días lectivos soltos entre festivos, vacacións ou fin de semana.</p>
+    <div id="cands"></div>
+  </div>
+  <div class="panel">
+    <h2>Votación</h2>
+    <div id="voteBox"></div>
+  </div>
+  <div class="panel">
+    <h3 style="margin-top:0">Reconto a man</h3>
+    <p class="small muted">Para contar mans alzadas ou votos polo chat da videochamada.</p>
+    <div class="tally" id="tally"></div>
+    <div class="row noprint" style="margin-top:.6rem"><button class="btn sm" id="tallyReset">Poñer a cero</button></div>
+  </div>
+</section>
+
+<section class="tab" id="t-exa"><div id="exaOut"></div></section>
+
+<section class="tab" id="t-ava">
+  <div class="panel">
+    <h2>Reparto das tres avaliacións</h2>
+    <div class="row noprint edit" style="margin-bottom:.6rem">
+      <button class="btn pri sm" id="autoBal">Reparto equilibrado</button>
+      <button class="btn sm" id="autoVac">Cortes en Nadal e Semana Santa</button>
+    </div>
+    <div class="row noprint edit">
+      <div class="fld"><label for="e1">Último día da 1ª</label><input type="date" id="e1" min="2026-09-09" max="2027-06-21"></div>
+      <div class="fld"><label for="e2">Último día da 2ª</label><input type="date" id="e2" min="2026-09-09" max="2027-06-21"></div>
+      <div class="fld"><label for="e3">Último día da 3ª</label><input type="date" id="e3" min="2026-09-10" max="2027-06-21"></div>
+    </div>
+    <div id="evalOut"></div>
+  </div>
+</section>
+
+<section class="tab" id="t-aju">
+  <div class="panel">
+    <h2>Inicio das clases</h2>
+    <p class="small muted">Nas ensinanzas de réxime especial pódese flexibilizar o inicio entre o 9 e o 16 de setembro.</p>
+    <select id="startSel"></select>
+  </div>
+  <div class="panel">
+    <h2>Festivos locais</h2>
+    <p class="small muted">Cargados os da Coruña. Cámbiaos se o centro está noutro concello.</p>
+    <div id="locals"></div>
+    <button class="btn sm noprint" id="addLocal">Engadir festivo local</button>
+  </div>
+  <div class="panel">
+    <h2>Outros días non lectivos</h2>
+    <div id="extras" class="small"></div>
+  </div>
+  <div class="panel noprint">
+    <h2>Cores</h2>
+    <p class="small muted">Cambia as cores da lenda, dos tipos de día, das avaliacións, das franxas de exames e probas e das propostas. Vense no calendario e na versión do profesorado.</p>
+    <div id="colorBox"></div>
+    <div class="row" style="margin-top:.6rem"><button class="btn sm" id="colReset">Restablecer todas as cores</button></div>
+  </div>
+  <div class="panel noprint">
+    <h2>Copia de seguranza</h2>
+    <p class="small muted">Sen despregar en Vercel, os datos só se gardan neste navegador. Descarga unha copia para non perdelos e impórtaa cando volvas abrir o calendario (ou noutro dispositivo).</p>
+    <div class="row">
+      <button class="btn pri sm" id="bkDown">Descargar copia (.json)</button>
+      <button class="btn sm" id="bkCopy">Copiar copia</button>
+      <label class="btn sm" for="impFile" style="cursor:pointer">Importar ficheiro…</label>
+      <input type="file" id="impFile" accept=".json,application/json" style="position:absolute;left:-9999px" aria-label="Importar copia">
+    </div>
+    <div class="fld"><label for="impTxt">Ou pega aquí unha copia e preme Importar</label><textarea id="impTxt" rows="3" placeholder="{ ... }"></textarea></div>
+    <button class="btn sm" id="impGo">Importar do texto</button>
+  </div>
+  <div class="panel noprint">
+    <h2>Versión para o profesorado</h2>
+    <div id="pubBox"></div>
+  </div>
+  <div class="panel noprint">
+    <h2>Opcións</h2>
+    <label class="row small"><input type="checkbox" id="hitosChk"> Amosar prazos e fitos no calendario</label>
+    <div class="row" style="margin-top:.8rem">
+      <button class="btn sm" id="copyBtn">Copiar resumo</button>
+      <button class="btn sm" id="printBtn">Imprimir</button>
+      <button class="btn sm" id="resetBtn">Restablecer todo</button>
+    </div>
+    <p class="small muted" id="copyMsg"></p>
+  </div>
+</section>
+
+<section class="tab" id="t-nor">
+  <div class="panel">
+    <h2>Que di a orde</h2>
+    <p class="small">Orde do 4 de xuño de 2026 (DOG núm. 110, do 15 de xuño de 2026). <a href="https://www.xunta.gal/dog/Publicados/2026/20260615/AnuncioG0761-050626-0001_gl.html" target="_blank" rel="noopener">Ver no DOG</a></p>
+    <ul class="clean small">
+      <li>Clases do 9 de setembro de 2026 ao 21 de xuño de 2027. No réxime especial o inicio pode flexibilizarse, pero as clases deben ter comezado o 16 de setembro.</li>
+      <li>Vacacións: do 22 de decembro ao 7 de xaneiro; 8, 9 e 10 de febreiro (Entroido); do 22 ao 29 de marzo (Semana Santa).</li>
+      <li>Día do Ensino: luns 7 de decembro, non lectivo.</li>
+      <li>Os festivos locais son non lectivos. Se un ou os dous non coinciden con días lectivos, o centro pode solicitar un ou dous días non lectivos antes do 16 de outubro de 2026 ante a dirección territorial. Recoméndase consensuar os días cos centros da mesma localidade.</li>
+      <li>Do 22 ao 30 de xuño o profesorado dedícase ás actas, informes, memorias, entrega de cualificacións e reclamacións, e permanece no centro ata o 30. A memoria anual envíase á Inspección antes do 9 de xullo e as actas quedan á súa disposición desde o 16 de xullo.</li>
+      <li>Avaliación inicial: como tarde o 16 de outubro. As avaliacións parciais fíxaas o centro procurando un reparto equilibrado.</li>
+    </ul>
+    <h3>Conservatorios (música e danza)</h3>
+    <ul class="clean small">
+      <li>Avaliación final ordinaria de grao elemental e profesional: a partir do 2 de xuño de 2027.</li>
+      <li>6º de grao profesional: avaliación final a partir do 10 de maio de 2027, salvo circunstancias excepcionais xustificadas.</li>
+      <li>Probas de acceso a grao elemental e profesional: a partir do 7 de xuño de 2027.</li>
+      <li>Probas extraordinarias: a partir do 22 de xuño de 2027, organizadas polo centro.</li>
+      <li>Os calendarios de fin de curso e probas autorízaos a dirección territorial; hai que solicalos antes do 30 de abril de 2027.</li>
+      <li>En xuño a dirección pode adaptar o horario do profesorado. O profesorado permanece no centro ata o 30 de xuño.</li>
+    </ul>
+    <h3>Festivos do curso</h3>
+    <p class="small">Estatais e autonómicos: 12 out, 8 dec, 25 dec, 1 e 6 xan, 19 mar, 25 e 26 mar, 1 mai (sábado), 17 mai. O 1 de novembro e o 6 de decembro caen en domingo e non se trasladan. Locais da Coruña: 7 out 2026 (Rosario), 9 feb 2027 (Martes de Entroido) e 24 xuñ 2027 (San Xoán).</p>
+    <h3>Ligazóns</h3>
+    <ul class="clean small">
+      <li><a href="https://www.xunta.gal/dog/Publicados/2026/20260615/AnuncioG0761-050626-0001_gl.html" target="_blank" rel="noopener">Orde do calendario escolar 2026/27 (DOG, en galego)</a></li>
+      <li><a href="https://www.xunta.gal/dog/Publicados/2026/20260702/AnuncioG0767-250626-0001_gl.html" target="_blank" rel="noopener">Decreto 68/2026: festas laborais de Galicia en 2027 (DOG)</a></li>
+      <li><a href="https://www.xunta.gal/es/notas-de-prensa/-/nova/025558/proximo-curso-escolar-2026-27-arrancara-9-septiembre-finalizara-21-junio" target="_blank" rel="noopener">Nota de prensa da Xunta sobre o curso 2026-27</a></li>
+    </ul>
+  </div>
+</section>
+</div>
+
+<div id="voterPage" hidden></div>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="false" aria-labelledby="shTitle">
+  <div class="sheet-in">
+    <div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div><h3 id="shTitle"></h3><div class="small muted" id="shSub"></div></div>
+      <button class="btn sm" id="shClose">Pechar</button>
+    </div>
+    <div class="acts" id="shActs"></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="config.js"></script>
+<script>
+(function(){
+const Q=new URLSearchParams(location.search);
+const MODE=Q.get('votar')?'voto':(Q.get('ver')?'ver':'admin');
+const RO=MODE!=='admin';
+const CFG=(window.CALENDARIO_CONFIG&&window.CALENDARIO_CONFIG.url&&window.CALENDARIO_CONFIG.key&&!/TU-PROYECTO/i.test(window.CALENDARIO_CONFIG.url))?window.CALENDARIO_CONFIG:null;
+
+const WD=['Luns','Martes','Mércores','Xoves','Venres'];
+const WD3=['Lun','Mar','Mér','Xov','Ven'];
+const WDH=['Lu','Ma','Mé','Xo','Ve','Sá','Do'];
+const WDI=['L','M','M','X','V','S','D'];
+const MES=['xaneiro','febreiro','marzo','abril','maio','xuño','xullo','agosto','setembro','outubro','novembro','decembro'];
+const MS=['xan','feb','mar','abr','mai','xuñ','xul','ago','set','out','nov','dec'];
+const DSEM=['domingo','luns','martes','mércores','xoves','venres','sábado'];
+const END='2027-06-21',LAST='2027-06-30',VEND='2027-07-31';
+const LET=['A','B','C','D','E','F','G','H'];
+const OCOL=LET.map((_,i)=>'var(--o'+(i+1)+')');
+
+const FIXED={
+ '2026-10-12':['fest','Festa Nacional de España'],
+ '2026-11-01':['fest','Todos os Santos (domingo)'],
+ '2026-12-06':['fest','Día da Constitución (domingo)'],
+ '2026-12-07':['ens','Día do Ensino'],
+ '2026-12-08':['fest','Inmaculada Concepción'],
+ '2026-12-25':['fest','Nadal'],
+ '2027-01-01':['fest','Aninovo'],
+ '2027-01-06':['fest','Reis'],
+ '2027-03-19':['fest','San Xosé'],
+ '2027-03-25':['fest','Xoves Santo'],
+ '2027-03-26':['fest','Venres Santo'],
+ '2027-05-01':['fest','Festa do Traballo (sábado)'],
+ '2027-05-17':['fest','Día das Letras Galegas']
+};
+const VAC=[['2026-12-22','2027-01-07','Vacacións de Nadal'],['2027-02-08','2027-02-10','Vacacións de Entroido'],['2027-03-22','2027-03-29','Vacacións de Semana Santa']];
+const HITOS={
+ '2026-09-16':'Límite para comezar as clases no réxime especial',
+ '2026-10-16':'Límite da avaliación inicial e da solicitude de días non lectivos',
+ '2027-04-30':'Límite para pedir a autorización dos calendarios de fin de curso e probas',
+ '2027-05-10':'Desde hoxe, avaliación final de 6º de grao profesional',
+ '2027-06-02':'Desde hoxe, avaliación final ordinaria de grao elemental e profesional',
+ '2027-06-07':'Desde hoxe, probas de acceso a grao elemental e profesional',
+ '2027-06-22':'Desde hoxe, probas extraordinarias',
+ '2027-06-30':'Último día do profesorado no centro',
+ '2027-07-09':'Límite para enviar a memoria anual do centro á Inspección',
+ '2027-07-16':'Desde hoxe, as actas de avaliación final quedan á disposición da Inspección'
+};
+const ACT=[
+ {id:'ex1',g:'p',n:'Semana de exames · 1ª avaliación',k:'ran',c:'ex'},
+ {id:'se1',g:'p',n:'Sesión de avaliación · 1ª',k:'dia',c:'se'},
+ {id:'ex2',g:'p',n:'Semana de exames · 2ª avaliación',k:'ran',c:'ex'},
+ {id:'se2',g:'p',n:'Sesión de avaliación · 2ª',k:'dia',c:'se'},
+ {id:'rec',g:'s',n:'Recitais de fin de grao profesional',k:'ran',c:'rc',hint:'Debe ser a semana inmediatamente anterior á semana de exames de 6º.'},
+ {id:'ex3a',g:'s',n:'Semana de exames · 3ª avaliación · 6º de GP e quen o solicite',k:'ran',c:'ex',hint:'Quen o solicite, con motivo xustificado (por exemplo, 2º de bacharelato).'},
+ {id:'se3a',g:'s',n:'Sesión de avaliación · 3ª · 6º de GP',k:'dia',c:'se',min:'2027-05-10',minTxt:'a partir do 10 de maio'},
+ {id:'ex3b',g:'r',n:'Semana de exames · 3ª avaliación · resto do alumnado',k:'ran',c:'ex'},
+ {id:'se3b',g:'r',n:'Sesión de avaliación final ordinaria · resto do alumnado',k:'dia',c:'se',min:'2027-06-02',minTxt:'a partir do 2 de xuño'},
+ {id:'acE',g:'x',n:'Probas de acceso a grao elemental',k:'ran',c:'ac',min:'2027-06-07',minTxt:'a partir do 7 de xuño'},
+ {id:'acP',g:'x',n:'Probas de acceso a grao profesional',k:'ran',c:'ac',min:'2027-06-07',minTxt:'a partir do 7 de xuño'},
+ {id:'acO',g:'x',n:'Probas de acceso a outros cursos',k:'ran',c:'ac'},
+ {id:'ext',g:'x',n:'Exames extraordinarios',k:'ran',c:'xt',min:'2027-06-22',minTxt:'a partir do 22 de xuño'}
+];
+const GRP={p:'Avaliacións parciais (1ª e 2ª)',s:'3ª avaliación · 6º de grao profesional',r:'3ª avaliación · resto do alumnado',x:'Probas de acceso e exames extraordinarios'};
+
+const DEF={start:'2026-09-09',locals:[{d:'2026-10-07',n:'Virxe do Rosario'},{d:'2027-02-09',n:'Martes de Entroido'},{d:'2027-06-24',n:'San Xoán'}],
+  centro:[],extra:[],e1:'',e2:'',e3:'',colors:{},hitos:true,acts:{},props:['','',''],cands:[],scope:'curso',mes:0,layout:'grella',z:1,proj:false,theme:'auto',tally:{}};
+const KEY='calendario-curso-2627-gl-v1';
+const clone=o=>JSON.parse(JSON.stringify(o));
+let S;
+try{S=Object.assign(clone(DEF),RO?{}:JSON.parse(localStorage.getItem(KEY)||'{}'))}catch(e){S=clone(DEF)}
+function normState(){
+  if(!Array.isArray(S.props))S.props=['','',''];
+  S.props=S.props.slice(0,8).map(x=>typeof x==='string'?x:'');
+  while(S.props.length<3)S.props.push('');
+  if(!Array.isArray(S.cands))S.cands=[];
+  if(!Array.isArray(S.locals))S.locals=clone(DEF.locals);
+  if(!Array.isArray(S.centro))S.centro=[];
+  if(!Array.isArray(S.extra))S.extra=[];
+  if(!S.tally||typeof S.tally!=='object')S.tally={};
+  if(!S.acts||typeof S.acts!=='object')S.acts={};
+  if(!S.colors||typeof S.colors!=='object'||Array.isArray(S.colors))S.colors={};
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(S.start||''))S.start=DEF.start;
+}
+normState();
+function save(){if(RO)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parse=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const add=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return ymd(d)};
+const dow=s=>parse(s).getDay();
+const fmt=s=>{const d=parse(s);return d.getDate()+' '+MS[d.getMonth()]};
+const fmtL=s=>{const d=parse(s);return DSEM[d.getDay()]+' '+d.getDate()+' de '+MES[d.getMonth()]};
+const cap=t=>t.charAt(0).toUpperCase()+t.slice(1);
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('on'),2800)}
+
+function monday(s){const d=parse(s);d.setDate(d.getDate()-((d.getDay()+6)%7));return ymd(d)}
+function actRange(id){const v=S.acts[id];return v&&v.a?[v.a,v.b||v.a]:null}
+function actsOn(s){return ACT.filter(a=>{const r=actRange(a.id);return r&&s>=r[0]&&s<=r[1]})}
+
+function localOf(s){return S.locals.find(l=>l.d===s)}
+function vacOf(s){return VAC.find(v=>s>=v[0]&&s<=v[1])}
+function info(s){
+  const w=dow(s),isWe=(w===0||w===6);
+  if(FIXED[s]&&FIXED[s][0]==='fest')return {t:isWe?'we':'fest',n:FIXED[s][1]};
+  const lo=localOf(s);if(lo)return {t:isWe?'we':'local',n:'Festivo local: '+lo.n};
+  const v=vacOf(s);if(v)return {t:isWe?'we':'vac',n:v[2]};
+  if(FIXED[s])return {t:'ens',n:FIXED[s][1]};
+  if(isWe)return {t:'we',n:'Fin de semana'};
+  if(s<S.start)return {t:s>='2026-09-01'?'act':'out',n:'Sen clases: actividades do profesorado (inicio de curso)'};
+  if(s>END)return s<=LAST?{t:'act',n:'Sen clase: exames, avaliacións e actividade do profesorado (ata o 30 de xuño)'}:{t:'out',n:'Fóra do período escolar'};
+  if(S.centro.includes(s))return {t:'cen',n:'Non lectivo elixido polo centro'};
+  if(S.extra.includes(s))return {t:'ext',n:'Outro día non lectivo'};
+  return {t:'lect',n:(S.e3&&s>S.e3)?'Lectivo: ampliación, recuperación e outras actividades (despois da 3ª avaliación)':'Lectivo'};
+}
+function lectivosIn(a,b){const r=[];for(let s=a;s<=b;s=add(s,1))if(info(s).t==='lect')r.push(s);return r}
+function lectivos(){return lectivosIn(S.start,END)}
+function wcount(list){const c=[0,0,0,0,0];list.forEach(s=>c[dow(s)-1]++);return c}
+function evalOf(s){return s<=S.e1?1:s<=S.e2?2:s<=S.e3?3:4}
+function autoBal(){const L=lectivosIn(S.start,S.e3||END),n=L.length;S.e1=L[Math.round(n/3)-1];S.e2=L[Math.round(2*n/3)-1]}
+function lastLectBefore(L,lim){let r='';L.forEach(s=>{if(s<lim)r=s});return r}
+function autoVac(){const L=lectivos();S.e1=lastLectBefore(L,'2026-12-22');S.e2=lastLectBefore(L,'2027-03-19')}
+function ensureEval(){if(!S.e3||S.e3>END)S.e3=END;if(!S.e1||!S.e2)autoBal();if(S.e3<=S.e2)S.e3=END;if(S.e1>S.e2){const t=S.e1;S.e1=S.e2;S.e2=t}}
+
+const SCOPE_NAME={curso:'Curso completo',t1:'1ª avaliación',t2:'2ª avaliación',t3:'3ª avaliación',amp:'Ampliación e recuperación (xuño)'};
+function monthBounds(i){const y=i<4?2026:2027,mo=(8+i)%12;return [ymd(new Date(y,mo,1)),ymd(new Date(y,mo+1,0))]}
+function range(){
+  if(S.scope==='t1')return ['2026-09-01',S.e1];
+  if(S.scope==='t2')return [add(S.e1,1),S.e2];
+  if(S.scope==='t3')return [add(S.e2,1),VEND];
+  if(S.scope==='amp')return [add(S.e3,1),VEND];
+  if(S.scope==='mes')return monthBounds(S.mes);
+  return ['2026-09-01',VEND];
+}
+function scopeLabel(){return S.scope==='mes'?cap(MES[(8+S.mes)%12])+' '+(S.mes<4?2026:2027):SCOPE_NAME[S.scope]}
+function activeProps(){return S.props}
+function rangeCount(){return S.scope==='t3'?[add(S.e2,1),S.e3]:range()}
+const AMP='Ampliación e recuperación (con clase)';
+
+function renderCounter(){
+  const r=rangeCount(),L=lectivosIn(r[0],r[1]),c=wcount(L),mx=Math.max(...c),mn=Math.min(...c);
+  let h='<div class="tot"><b>'+L.length+'</b><span>días lectivos<br>'+esc(scopeLabel())+'</span></div>';
+  c.forEach((n,i)=>{
+    const cls=(mx!==mn&&n===mx)?' max':(mx!==mn&&n===mn)?' min':'';
+    h+='<div class="wd'+cls+'" title="'+WD[i]+': '+n+' días"><div class="n">'+n+'</div><div class="l">'+WD3[i]+'</div><div class="bar" style="width:'+(mx?n/mx*100:0)+'%"></div></div>';
+  });
+  $('counter').innerHTML=h;
+}
+function renderLegend(){
+  const band=(c,t)=>'<span><i class="sw ev" style="background:var(--c-'+c+');height:.5rem"></i>'+t+'</span>';
+  $('legend').innerHTML=
+   '<span><i class="sw lect"></i>Lectivo</span><span><i class="sw fest"></i>Festivo</span><span><i class="sw local"></i>Festivo local</span>'+
+   '<span><i class="sw vac"></i>Vacacións</span><span><i class="sw ens"></i>Día do Ensino</span><span><i class="sw cen"></i>Día do centro</span>'+
+   '<span><i class="sw ext"></i>Outro non lectivo</span><span><i class="sw act"></i>Sen clase, con actividade</span><span><i class="sw we"></i>Fin de semana</span>'+
+   '<span><i class="sw ev" style="background:var(--e1)"></i>1ª<i class="sw ev" style="background:var(--e2)"></i>2ª<i class="sw ev" style="background:var(--e3)"></i>3ª avaliación<i class="sw ev" style="background:var(--e4)"></i>Ampliación e recuperación (con clase) · franxa de abaixo</span>'+
+   band('ex','Semana de exames')+band('se','Sesión de avaliación')+band('rc','Recital')+band('ac','Probas de acceso')+band('xt','Extraordinarios')+
+   '<span><b style="display:inline-flex;width:1.15rem;height:1.15rem;border-radius:50%;background:var(--o1);color:#fff;font-size:.72rem;align-items:center;justify-content:center">A</b>Proposta</span>';
+}
+function renderSum(){
+  const box=$('sum');
+  if(S.scope==='mes'){box.hidden=true;return}
+  box.hidden=false;
+  const r=range(),rc=rangeCount(),L=lectivosIn(rc[0],rc[1]);
+  const a0=(S.scope==='amp'&&L.length)?L[0]:(rc[0]<S.start?S.start:rc[0]),a1=rc[1]>END?END:rc[1];
+  const wk=L.length?new Set(L.map(s=>{const d=parse(s);d.setDate(d.getDate()-(d.getDay()+6)%7);return ymd(d)})).size:0;
+  box.innerHTML='<b>'+esc(scopeLabel())+'</b><span>'+fmt(a0)+' – '+fmt(a1)+'</span><span><b>'+L.length+'</b> días lectivos</span><span>'+wk+' semanas con clase</span>'+(S.scope==='t3'&&S.e3<END?'<span class="muted">Despois do fin da 3ª hai clase ata o 21 de xuño: ampliación, recuperación e outras actividades (vista «Ampliación»).</span>':'')+(S.scope==='amp'?'<span class="muted">Días con clase despois da 3ª avaliación: ampliación, recuperación e outras actividades.</span>':'')+(r[1]>END?'<span class="muted">Despois do 21 de xuño seguen exames, avaliacións e actividade do profesorado ata o 30 de xuño.</span>':'');
+}
+
+function cellHTML(s,inRange,today,inLine){
+  const I=info(s),ev=I.t==='lect'?evalOf(s):0;
+  const isEnd=(s===S.e1||s===S.e2||(s===S.e3&&S.e3!==END)),hit=S.hitos&&HITOS[s];
+  const P=activeProps(),pi=P.indexOf(s),A=actsOn(s);
+  const title=fmtL(s)+'. '+I.n+(A.length?'. '+A.map(a=>a.n).join('; '):'')+(hit?'. '+HITOS[s]:'')+(isEnd?'. Fin de avaliación':'')+(pi>=0?'. Proposta '+LET[pi]:'');
+  const d=parse(s).getDate();
+  return '<button class="d '+I.t+(inRange?'':' fora')+(isEnd?' evend':'')+(s===today?' today':'')+(pi>=0?' pp':'')+'" data-s="'+s+'" aria-label="'+esc(title)+'" title="'+esc(title)+'"'+(pi>=0?' style="--o:'+OCOL[pi]+'"':'')+'>'+
+    (inLine?'<span>'+d+'</span><small>'+WDI[(dow(s)+6)%7]+'</small>':d)+
+    A.slice(0,2).map((a,i)=>'<span class="acb'+(i?' b2':'')+'" style="--ac:var(--c-'+a.c+')"></span>').join('')+
+    (ev?'<span class="ev" style="background:var(--e'+ev+')"></span>':'')+(hit?'<span class="hit"></span>':'')+
+    (pi>=0?'<span class="pr" style="--o:'+OCOL[pi]+'">'+LET[pi]+'</span>':'')+'</button>';
+}
+function visibleMonths(){
+  const r=range(),out=[];
+  for(let m=0;m<11;m++){const b=monthBounds(m);if(b[0]<=r[1]&&b[1]>=r[0])out.push(m)}
+  return out;
+}
+function renderMonths(){
+  const r=range(),today=ymd(new Date()),ms=visibleMonths();
+  let h='';
+  if(S.layout==='linea'){
+    h='<div class="tw"><table class="linea"><thead><tr><th class="lab"></th>';
+    for(let d=1;d<=31;d++)h+='<th class="n">'+d+'</th>';
+    h+='</tr></thead><tbody>';
+    ms.forEach(m=>{
+      const y=m<4?2026:2027,mo=(8+m)%12,days=new Date(y,mo+1,0).getDate();
+      const b=monthBounds(m),cnt=lectivosIn(b[0]<r[0]?r[0]:b[0],b[1]>r[1]?r[1]:b[1]).length;
+      h+='<tr><th class="lab">'+cap(MES[mo])+' '+y+'<small>'+cnt+' lectivos</small></th>';
+      for(let d=1;d<=31;d++){
+        if(d>days){h+='<td></td>';continue}
+        const s=y+'-'+pad(mo+1)+'-'+pad(d);
+        h+='<td>'+cellHTML(s,s>=r[0]&&s<=r[1],today,true)+'</td>';
+      }
+      h+='</tr>';
+    });
+    h+='</tbody></table></div>';
+    $('months').innerHTML=h;return;
+  }
+  ms.forEach(m=>{
+    const y=m<4?2026:2027,mo=(8+m)%12,first=new Date(y,mo,1),days=new Date(y,mo+1,0).getDate();
+    const b=monthBounds(m),cnt=lectivosIn(b[0]<r[0]?r[0]:b[0],b[1]>r[1]?r[1]:b[1]).length;
+    let g='';WDH.forEach(x=>g+='<div class="dh">'+x+'</div>');
+    const off=(first.getDay()+6)%7;
+    for(let i=0;i<off;i++)g+='<div class="blank"></div>';
+    for(let d=1;d<=days;d++){const s=y+'-'+pad(mo+1)+'-'+pad(d);g+=cellHTML(s,s>=r[0]&&s<=r[1],today,false)}
+    h+='<div class="month"><div class="mh"><b>'+cap(MES[mo])+' '+y+'</b><span>'+cnt+' lectivos</span></div><div class="grid">'+g+'</div></div>';
+  });
+  const cls=S.scope==='mes'?'m1':(S.scope==='curso'?'':'m4');
+  $('months').innerHTML='<div class="months '+cls+'">'+h+'</div>';
+}
+
+/* Ferramenta de marcado */
+let tool='',pend=null;
+function toolOptions(){
+  const np=Math.max(3,S.props.length);
+  let h='<option value="">Tocar un día abre o menú</option>';
+  h+='<optgroup label="Avaliacións"><option value="e1">Fin da 1ª avaliación</option><option value="e2">Fin da 2ª avaliación</option><option value="e3">Fin da 3ª avaliación</option></optgroup>';
+  ['p','s','r','x'].forEach(g=>{h+='<optgroup label="'+esc(GRP[g])+'">'+ACT.filter(a=>a.g===g).map(a=>'<option value="a:'+a.id+'">'+esc(a.n)+'</option>').join('')+'</optgroup>'});
+  h+='<optgroup label="Centro"><option value="cen">Día do centro (decidido)</option><option value="ext">Outro día non lectivo</option><option value="loc">Festivo local</option></optgroup>';
+  h+='<optgroup label="Propostas">'+LET.slice(0,np).map((l,i)=>'<option value="p:'+i+'">Proposta '+l+'</option>').join('')+'</optgroup>';
+  return h;
+}
+function toolName(){
+  if(tool==='e1')return 'Fin da 1ª avaliación';if(tool==='e2')return 'Fin da 2ª avaliación';if(tool==='e3')return 'Fin da 3ª avaliación';
+  if(tool==='cen')return 'Día do centro';if(tool==='ext')return 'Outro día non lectivo';if(tool==='loc')return 'Festivo local';
+  if(tool.indexOf('a:')===0){const a=ACT.find(x=>x.id===tool.slice(2));return a?a.n:''}
+  if(tool.indexOf('p:')===0)return 'Proposta '+LET[+tool.slice(2)];
+  return '';
+}
+function renderToolHint(){
+  const row=$('toolRow');if(!row)return;
+  $('tool').innerHTML=toolOptions();$('tool').value=tool;
+  row.classList.toggle('on',!!tool);
+  $('toolDone').hidden=!tool;
+  let h='Elixe que queres marcar e toca os días no calendario. Se non elixes nada, tocar un día abre o seu menú.';
+  if(tool){
+    const a=tool.indexOf('a:')===0?ACT.find(x=>x.id===tool.slice(2)):null;
+    if(a&&a.k==='ran')h=pend&&pend.id===a.id?'«'+a.n+'» desde '+fmt(pend.a)+'. Toca o último día.':'«'+a.n+'»: toca o primeiro día e despois o último.';
+    else if(a)h='«'+a.n+'»: toca o día (tocar de novo o mesmo día quítao).';
+    else h='«'+toolName()+'»: toca os días que queiras marcar ou quitar.';
+  }
+  $('toolHint').textContent=h;
+}
+function applyTool(s){
+  const t=tool,I=info(s);
+  if(t==='e1'||t==='e2'||t==='e3'){if(I.t!=='lect'){toast('Elixe un día lectivo.');return}if(t==='e3'&&s<=S.e2){toast('O fin da 3ª debe ser despois do fin da 2ª.');return}S[t]=s}
+  else if(t.indexOf('a:')===0){
+    const a=ACT.find(x=>x.id===t.slice(2));if(!a)return;
+    if(a.k==='dia'){if(S.acts[a.id]&&S.acts[a.id].a===s)delete S.acts[a.id];else S.acts[a.id]={a:s}}
+    else if(pend&&pend.id===a.id){const x=pend.a<=s?[pend.a,s]:[s,pend.a];S.acts[a.id]={a:x[0],b:x[1]};pend=null}
+    else{pend={id:a.id,a:s};S.acts[a.id]={a:s,b:s}}
+  }
+  else if(t==='cen'||t==='ext'){
+    if(!(I.t==='lect'||I.t==='cen'||I.t==='ext')){toast('Só se poden marcar días lectivos.');return}
+    if(t==='cen'){toggle(S.centro,s);S.extra=S.extra.filter(x=>x!==s)}else{toggle(S.extra,s);S.centro=S.centro.filter(x=>x!==s)}
+  }
+  else if(t==='loc'){
+    const w=dow(s);if(w===0||w===6){toast('Elixe un día de luns a venres.');return}
+    const i=S.locals.findIndex(l=>l.d===s);if(i>=0)S.locals.splice(i,1);else S.locals.push({d:s,n:'Festivo local'});
+  }
+  else if(t.indexOf('p:')===0){
+    const i=+t.slice(2);ensureSlots(i);
+    if(S.props[i]===s)S.props[i]='';else setProp(i,s);
+  }
+  commit();
+}
+function toggle(arr,s){const i=arr.indexOf(s);if(i>=0)arr.splice(i,1);else arr.push(s)}
+
+function renderTools(){
+  applyColors();
+  document.querySelectorAll('#scopeSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.scope===S.scope));
+  document.querySelectorAll('#layoutSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.layout===S.layout));
+  if($('scopeAmp')){$('scopeAmp').hidden=S.e3>=END;if(S.e3>=END&&S.scope==='amp')S.scope='curso'}
+  $('mesNav').hidden=S.scope!=='mes';
+  let o='';for(let m=0;m<11;m++){const mo=(8+m)%12;o+='<option value="'+m+'"'+(m===S.mes?' selected':'')+'>'+cap(MES[mo])+' '+(m<4?2026:2027)+'</option>'}
+  $('mSel').innerHTML=o;
+  $('projBtn').setAttribute('aria-pressed',S.proj);
+  $('projBtn').textContent=S.proj?'Saír da proxección':'Modo proxección';
+  $('themeBtn').textContent='Tema: '+({auto:'automático',light:'claro',dark:'escuro'}[S.theme]);
+  document.body.classList.toggle('proj',!!S.proj);
+  document.documentElement.style.fontSize=(16*S.z)+'px';
+  if(S.theme==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',S.theme);
+  if(!RO)renderToolHint();
+}
+
+/* Propostas */
+function nSlots(){return Math.max(3,S.props.length)}
+function ensureSlots(i){while(S.props.length<=i)S.props.push('')}
+function setProp(i,s){ensureSlots(i);for(let k=0;k<S.props.length;k++)if(S.props[k]===s)S.props[k]='';S.props[i]=s}
+function addProp(s){
+  if(S.props.includes(s))return true;
+  let i=S.props.findIndex(x=>!x);
+  if(i<0){if(S.props.length>=8){toast('Máximo 8 propostas.');return false}S.props.push('');i=S.props.length-1}
+  S.props[i]=s;return true;
+}
+function restAround(s){
+  let a=0,x=add(s,-1);while(x>=S.start&&info(x).t!=='lect'){a++;x=add(x,-1)}
+  let p=0;x=add(s,1);while(x<=END&&info(x).t!=='lect'){p++;x=add(x,1)}
+  return a+1+p;
+}
+function effect(s){
+  const base=lectivos(),c0=wcount(base),c1=wcount(base.filter(x=>x!==s)),wi=dow(s)-1,mx=Math.max(...c0);
+  return {rest:restAround(s),wi:wi,before:c0[wi],after:c1[wi],total:base.length-1,ev:evalOf(s),wasMax:c0[wi]===mx&&Math.min(...c0)!==mx};
+}
+function slotHTML(i){
+  const s=S.props[i]||'',col=OCOL[i];
+  let body='',btns='';
+  if(!s)body='<div class="small muted">Sen data. Escribe unha ou toca un día lectivo co modo «Proposta '+LET[i]+'».</div>';
+  else{
+    const I=info(s);
+    if(I.t!=='lect')body='<div class="small">Este día non é lectivo ('+esc(I.n)+').</div>';
+    else{
+      const e=effect(s);
+      body='<ul><li>Descanso de <b>'+e.rest+' días</b> seguidos</li><li>Cae '+(e.ev===4?'no período de <b>ampliación e recuperación</b>':'na <b>'+e.ev+'ª avaliación</b>')+'</li><li>'+WD[e.wi]+': <b>'+e.before+' → '+e.after+'</b>'+(e.wasMax?' <span class="tag">era o día con máis</span>':'')+'</li><li>Total do curso: <b>'+e.total+'</b></li></ul>';
+      btns+='<button class="btn sm" data-fix="'+s+'">Fixar como día do centro</button>';
+    }
+    btns+='<button class="btn sm" data-unprop="'+i+'">Baleirar</button>';
+  }
+  if(i>=3&&i===S.props.length-1)btns+='<button class="btn sm" data-delslot="'+i+'">Eliminar espazo</button>';
+  return '<div class="slot'+(s?'':' empty')+'" style="--o:'+col+'"><div class="row"><span class="let">'+LET[i]+'</span><input type="date" data-pdate="'+i+'" value="'+s+'" min="2026-09-01" max="2027-07-31" aria-label="Data da proposta '+LET[i]+'"></div>'+(s?'<div class="dt">'+esc(cap(fmtL(s)))+'</div>':'')+body+'<div class="row noprint" style="margin-top:.5rem">'+btns+'</div></div>';
+}
+function localsStatus(){
+  return S.locals.filter(l=>l.d).map(l=>{
+    const w=dow(l.d),v=vacOf(l.d);let why='';
+    if(w===0||w===6)why='cae en fin de semana';else if(v)why='cae en '+v[2].toLowerCase();else if(l.d<S.start||l.d>END)why='cae fóra do período lectivo';
+    return {l:l,lect:!why,why:why};
+  });
+}
+function runs(){
+  const out=[];let cur=[];
+  for(let s=S.start;s<=add(END,1);s=add(s,1)){if(s<=END&&info(s).t==='lect')cur.push(s);else{if(cur.length)out.push(cur);cur=[]}}
+  return out;
+}
+function offAround(a,dir){let n=0,s=add(a,dir);while(s>=S.start&&s<=END&&info(s).t!=='lect'){n++;s=add(s,dir)}return n}
+function candHTML(c,i){
+  const pi=c.d?S.props.indexOf(c.d):-1;
+  let eff='';
+  if(c.d){const I=info(c.d);if(I.t==='lect'){const e=effect(c.d);eff='Descanso de '+e.rest+' días · '+WD[e.wi]+' '+e.before+' → '+e.after+' · '+(e.ev===4?'ampliación e recuperación':e.ev+'ª avaliación')}else eff='Non é un día lectivo ('+I.n+').'}
+  else eff='Elixe unha data.';
+  return '<div class="cand2"><div class="row"><input type="date" data-cd="'+i+'" value="'+(c.d||'')+'" min="2026-09-01" max="2027-07-31" aria-label="Data"><input type="text" data-cn="'+i+'" value="'+esc(c.n||'')+'" placeholder="Nota (quen o propón…)" aria-label="Nota" style="flex:1 1 10rem"></div>'+
+    '<div class="small muted">'+esc(eff)+'</div><div class="row noprint">'+
+    (c.d?(pi>=0?'<button class="btn sm pri" data-cunprop="'+i+'">Proposta '+LET[pi]+' ✓</button>':'<button class="btn sm" data-cprop="'+i+'">Pasar a proposta</button>'):'')+
+    '<button class="btn sm" data-cdel="'+i+'">Quitar</button></div></div>';
+}
+function renderProp(){
+  const st=localsStatus(),allowed=Math.min(2,st.filter(x=>!x.lect).length);
+  let intro='Festivos locais: '+st.map(x=>fmt(x.l.d)+' ('+esc(x.l.n)+') '+(x.lect?'coincide con día lectivo':x.why)).join('; ')+'. ';
+  intro+=allowed?('Segundo o art. 7.2, o centro pode solicitar ata '+allowed+(allowed>1?' días':' día')+' antes do 16 de outubro. Confirma o número coa dirección territorial.'):'Todos os festivos locais caen en días lectivos, así que non corresponde solicitar días.';
+  $('cenIntro').innerHTML=intro;
+  let sl='';for(let i=0;i<nSlots();i++)sl+=slotHTML(i);
+  $('slots').innerHTML=sl;
+  $('addSlot').disabled=nSlots()>=8;
+  let h='';
+  if(S.centro.length)h='<h3 style="margin-top:0">Día(s) do centro fixado(s)</h3><ul class="clean">'+S.centro.slice().sort().map(s=>'<li class="row" style="justify-content:space-between"><span><span class="dot" style="background:var(--cen)"></span>'+esc(cap(fmtL(s)))+'</span><button class="btn sm" data-uncen="'+s+'">Quitar</button></li>').join('')+'</ul>';
+  if(S.centro.length>allowed&&allowed>0)h+='<div class="note small">Marcaches '+S.centro.length+' días e en principio corresponden '+allowed+'.</div>';
+  $('cenChosen').innerHTML=h;
+  $('candList').innerHTML=S.cands.length?S.cands.map(candHTML).join(''):'<p class="small muted">Aínda non hai días na lista.</p>';
+
+  const c=wcount(lectivos()),mx=Math.max(...c);
+  const R=runs().filter(r=>r.length<=2).map(r=>({r:r,pre:offAround(r[0],-1),post:offAround(r[r.length-1],1)})).filter(x=>x.pre>0&&x.post>0).map(x=>({r:x.r,total:x.pre+x.r.length+x.post})).sort((a,b)=>a.r.length-b.r.length||b.total-a.total);
+  let ch=R.length?'':'<p class="small">Non quedan días soltos entre períodos non lectivos.</p>';
+  R.forEach(x=>{
+    const names=x.r.map(fmtL).join(' e ');
+    const hits=x.r.some(s=>c[dow(s)-1]===mx&&Math.min(...c)!==mx);
+    ch+='<div class="cand"><div><b>'+esc(cap(names))+'</b><div class="small muted">Descanso de '+x.total+' días seguidos'+(x.r.length>1?' se se marcan os dous':'')+'.'+(hits?' <span class="tag">resta ao día con máis lectivos</span>':'')+'</div></div><div class="row">'+
+      x.r.map(s=>S.cands.some(k=>k.d===s)?'<span class="small muted">'+fmt(s)+' na lista</span>':'<button class="btn sm" data-addcand="'+s+'">Engadir '+fmt(s)+' á lista</button>').join('')+'</div></div>';
+  });
+  $('cands').innerHTML=ch;
+}
+
+/* Avaliacións */
+function renderEval(){
+  $('e1').value=S.e1||'';$('e2').value=S.e2||'';$('e3').value=S.e3||'';
+  const L=lectivos(),E=[[],[],[],[]];L.forEach(s=>{const k=evalOf(s);E[k?k-1:3].push(s)});
+  const tot=L.length||1,post=E[3].length>0;
+  let bar='<div class="balance">'+E.map((e,i)=>'<span style="width:'+(e.length/tot*100)+'%;background:'+'var(--e'+(i+1)+')'+'"></span>').join('')+'</div>';
+  let t='<div class="tw"><table class="t"><tr><th>Avaliación</th><th>Desde</th><th>Ata</th><th>Días</th><th>Semanas</th>'+WD3.map(x=>'<th>'+x+'</th>').join('')+'</tr>';
+  E.forEach((e,i)=>{
+    if(i===3&&!post)return;
+    const c=wcount(e),wk=e.length?new Set(e.map(s=>{const d=parse(s);d.setDate(d.getDate()-(d.getDay()+6)%7);return ymd(d)})).size:0;
+    t+='<tr><td><span class="dot" style="background:'+'var(--e'+(i+1)+')'+'"></span>'+(i<3?(i+1)+'ª':'Ampliación e recuperación')+'</td><td>'+(e[0]?fmt(e[0]):'–')+'</td><td>'+(e.length?fmt(e[e.length-1]):'–')+'</td><td><b>'+e.length+'</b></td><td>'+wk+'</td>'+c.map(n=>'<td>'+n+'</td>').join('')+'</tr>';
+  });
+  t+='</table></div>';
+  const lens=E.slice(0,3).map(e=>e.length),diff=Math.max(...lens)-Math.min(...lens);
+  let adv='<p class="small">Diferenza entre a avaliación máis longa e a máis curta: <b>'+diff+' días</b>.</p>';
+  if(post)adv+='<p class="small muted">Os '+E[3].length+' días lectivos despois do fin da 3ª (xuño) teñen clase: ampliación, recuperación e outras actividades. Non entran nunha avaliación, pero son lectivos e contan no total.</p>';
+  E.slice(0,3).forEach((e,i)=>{const c=wcount(e),mx=Math.max(...c),mn=Math.min(...c);if(mx-mn>=3)adv+='<p class="small muted">Na '+(i+1)+'ª, o '+WD[c.indexOf(mn)].toLowerCase()+' ten '+(mx-mn)+' sesións menos que o '+WD[c.indexOf(mx)].toLowerCase()+'. Afecta ás materias desa xornada.</p>'});
+  if(S.e2>='2027-05-10')adv+='<p class="small muted">Lembra que 6º de grao profesional pode avaliarse a partir do 10 de maio.</p>';
+  $('evalOut').innerHTML=bar+t+adv;
+}
+
+/* Exames e probas */
+function blocked(a,b){const out=[];for(let s=a;s<=b;s=add(s,1)){const w=dow(s);if(w===0||w===6)continue;const I=info(s);if(['fest','local','vac','ens'].includes(I.t))out.push(fmt(s)+' ('+I.n+')')}return out}
+function actWarn(a){
+  const r=actRange(a.id),w=[];if(!r)return w;
+  if(a.min&&r[0]<a.min)w.push('A orde sitúa esta actividade '+a.minTxt+'.');
+  const bl=blocked(r[0],r[1]);
+  if(a.k==='dia'){if(dow(r[0])===0||dow(r[0])===6)w.push('Cae en fin de semana.');else if(bl.length)w.push('Cae nun día non hábil: '+bl[0]+'.')}
+  else if(bl.length)w.push('Inclúe días non hábiles: '+bl.join('; ')+'.');
+  const pair={se1:'ex1',se2:'ex2',se3a:'ex3a',se3b:'ex3b'}[a.id];
+  if(pair){const e=actRange(pair);if(e&&r[0]<=e[1])w.push('A sesión debe ser despois da semana de exames.')}
+  if(a.id==='rec'){const e=actRange('ex3a');if(e){if(r[1]>=e[0])w.push('Os recitais deben acabar antes da semana de exames de 6º.');else if((parse(e[0])-parse(r[1]))/86400000>3)w.push('Hai máis dunha semana entre os recitais e a semana de exames de 6º.')}}
+  return w;
+}
+function rowHTML(a){
+  const r=actRange(a.id),v=S.acts[a.id]||{};let ctl='';
+  if(!RO){
+    if(a.k==='dia')ctl='<input type="date" data-ad="'+a.id+'" value="'+(v.a||'')+'" min="2026-09-01" max="2027-07-31" aria-label="Día">';
+    else ctl='<input type="date" data-ara="'+a.id+'" value="'+(v.a||'')+'" min="2026-09-01" max="2027-07-31" aria-label="Desde"><span>–</span><input type="date" data-arb="'+a.id+'" value="'+(v.b||'')+'" min="'+(v.a||'2026-09-01')+'" max="2027-07-31" aria-label="Ata">';
+    ctl+='<button class="btn sm" data-adel="'+a.id+'"'+(r?'':' disabled')+'>Quitar</button>';
+  }
+  const sum=r?(r[0]===r[1]?cap(fmtL(r[0])):cap(fmtL(r[0]))+' – '+fmtL(r[1])+(a.c==='ex'?' · '+lectivosIn(r[0],r[1]).length+' días lectivos':'')):'Sen data'+(a.minTxt?'. A orde di '+a.minTxt+'.':'.');
+  const ws=RO?'':actWarn(a).map(x=>'<div class="warn">'+esc(x)+'</div>').join('');
+  return '<div class="arow"><div><span class="dot" style="background:var(--c-'+a.c+')"></span><b>'+esc(a.n)+'</b><div class="small muted">'+esc(sum)+(a.hint&&!RO?' '+esc(a.hint):'')+'</div>'+ws+'</div>'+(RO?'':'<div class="row noprint">'+ctl+'</div>')+'</div>';
+}
+function renderExa(){
+  let h='';
+  if(!RO)h+='<div class="panel"><h2>Exames, sesións e probas</h2><p class="small muted">As datas aparecen no calendario como unha franxa de cor arriba de cada día. Tamén podes poñelas desde o calendario co selector «Marcar no calendario». Cada semana de exames pode ir de calquera día a calquera outro. Os avisos comproban as datas mínimas da orde e os días non hábiles. A proposta usa a semana anterior a cada sesión para os exames (e a anterior a esa para os recitais), e para a 3ª a data mínima da orde: 10 de maio en 6º de GP e 2 de xuño no resto.</p>'+
+   '<p class="small muted">As sesións de avaliación teñen clase (fanse pola mañá), así que contan como días lectivos.</p>'+
+   '<div class="row noprint" style="margin-top:.6rem"><button class="btn sm pri" id="exaProp">Propoñer datas das 3 avaliacións</button><button class="btn sm" id="exaClear">Borrar todas as datas</button></div></div>';
+  else h+='<div class="panel"><h2>Exames, sesións e probas</h2><p class="small muted">Datas do curso 2026-27. As sesións de avaliación teñen clase (fanse pola mañá).</p></div>';
+  ['p','s','r','x'].forEach(g=>{h+='<div class="panel"><h3 style="margin-top:0">'+GRP[g]+'</h3>'+ACT.filter(a=>a.g===g).map(rowHTML).join('')+'</div>'});
+  const L=ACT.filter(a=>actRange(a.id)).sort((x,y)=>actRange(x.id)[0]<actRange(y.id)[0]?-1:1);
+  h+='<div class="panel"><h3 style="margin-top:0">Axenda por orde de data</h3>'+(L.length?'<ul class="clean small">'+L.map(a=>{const r=actRange(a.id);return '<li><span class="dot" style="background:var(--c-'+a.c+')"></span><b>'+(r[0]===r[1]?fmt(r[0]):fmt(r[0])+' – '+fmt(r[1]))+'</b> · '+esc(a.n)+'</li>'}).join('')+'</ul>':'<p class="small muted">Aínda non hai datas.</p>')+'</div>';
+  $('exaOut').innerHTML=h;
+}
+function weekBefore(s){const m=add(monday(s),-7);return {a:m,b:add(m,4)}}
+function firstLect(from){let s=from;while(s<=END&&info(s).t!=='lect')s=add(s,1);return s}
+function proposeP(){
+  [[S.e1,'se1','ex1'],[S.e2,'se2','ex2']].forEach(x=>{S.acts[x[1]]={a:x[0]};S.acts[x[2]]=weekBefore(x[0])});
+  const s3a=firstLect('2027-05-10');
+  S.acts.se3a={a:s3a};S.acts.ex3a=weekBefore(s3a);S.acts.rec=weekBefore(S.acts.ex3a.a);
+  const s3b=firstLect('2027-06-02');
+  S.acts.se3b={a:s3b};S.acts.ex3b=weekBefore(s3b);
+}
+
+/* Axustes */
+function renderAjustes(){
+  let o='';for(let s='2026-09-09';s<='2026-09-16';s=add(s,1)){const w=dow(s);if(w&&w<6)o+='<option value="'+s+'"'+(s===S.start?' selected':'')+'>'+esc(cap(fmtL(s)))+'</option>'}
+  $('startSel').innerHTML=o;
+  $('locals').innerHTML=S.locals.map((l,i)=>'<div class="lrow"><input type="date" data-ld="'+i+'" value="'+l.d+'" min="2026-09-01" max="2027-08-31"><input type="text" data-ln="'+i+'" value="'+esc(l.n)+'" aria-label="Nome do festivo"><button class="btn sm" data-ldel="'+i+'">Quitar</button></div>').join('');
+  $('extras').innerHTML=S.extra.length?'<ul class="clean">'+S.extra.slice().sort().map(s=>'<li class="row" style="justify-content:space-between"><span>'+esc(cap(fmtL(s)))+'</span><button class="btn sm" data-unext="'+s+'">Quitar</button></li>').join('')+'</ul>':'<p class="muted">Ningún. Usa «Marcar no calendario» → «Outro día non lectivo».</p>';
+  $('hitosChk').checked=!!S.hitos;
+  renderColors();renderPub();
+}
+
+/* Reconto a man */
+function renderTally(){
+  const P=activeProps();let h='';
+  for(let i=0;i<nSlots();i++){
+    if(!P[i]&&i>=3)continue;
+    const k=LET[i];
+    h+='<div class="tal" style="--o:'+OCOL[i]+'"><span class="num">'+(S.tally[k]||0)+'</span><div class="tl"><b>'+k+'</b> · '+(P[i]?fmt(P[i]):'sen data')+'</div><div class="row noprint" style="justify-content:center"><button class="btn sm" data-tm="'+k+'" aria-label="Restar a '+k+'">−</button><button class="btn sm pri" data-tp="'+k+'" aria-label="Sumar a '+k+'">+</button></div></div>';
+  }
+  h+='<div class="tal" style="--o:var(--muted)"><span class="num">'+(S.tally.X||0)+'</span><div class="tl"><b>Abst.</b></div><div class="row noprint" style="justify-content:center"><button class="btn sm" data-tm="X" aria-label="Restar abstención">−</button><button class="btn sm pri" data-tp="X" aria-label="Sumar abstención">+</button></div></div>';
+  $('tally').innerHTML=h;
+}
+
+function commit(){ensureEval();save();renderAll()}
+function renderAll(){
+  ensureEval();renderTools();renderCounter();renderLegend();renderSum();renderMonths();
+  if(!RO){renderProp();renderAjustes();renderTally();renderVote()}
+  renderEval();renderExa();
+}
+
+/* Folla de accións */
+const sheet=$('sheet');let cur=null;
+function openSheet(s){
+  cur=s;const I=info(s),A=actsOn(s);
+  $('shTitle').textContent=cap(fmtL(s));
+  $('shSub').textContent=I.n+(A.length?'. '+A.map(a=>a.n).join('; '):'')+(HITOS[s]?'. '+HITOS[s]:'');
+  const acts=[];
+  if(!RO){
+    const canMark=(I.t==='lect'||I.t==='cen'||I.t==='ext');
+    if(canMark){
+      acts.push(['cen',S.centro.includes(s)?'Quitar día do centro':'Día do centro (decidido)',S.centro.includes(s)]);
+      acts.push(['ext',S.extra.includes(s)?'Quitar outro non lectivo':'Outro día non lectivo',S.extra.includes(s)]);
+    }
+    if(I.t==='lect'||S.props.includes(s)){
+      for(let i=0;i<nSlots();i++)acts.push(['p'+i,S.props[i]===s?'Quitar proposta '+LET[i]:'Proposta '+LET[i],S.props[i]===s]);
+    }
+    if(I.t==='lect'){acts.push(['e1','Fin da 1ª avaliación',s===S.e1]);acts.push(['e2','Fin da 2ª avaliación',s===S.e2]);if(s>S.e2)acts.push(['e3','Fin da 3ª avaliación',s===S.e3])}
+    const isLoc=!!localOf(s);
+    if(dow(s)>0&&dow(s)<6&&(I.t==='lect'||isLoc))acts.push(['loc',isLoc?'Quitar festivo local':'Marcar como festivo local',isLoc]);
+    A.forEach(a=>acts.push(['x:'+a.id,'Quitar: '+a.n,true]));
+  }
+  $('shActs').innerHTML=acts.length?acts.map(a=>'<button class="btn'+(a[2]?' on':'')+'" data-act="'+a[0]+'">'+esc(a[1])+'</button>').join(''):'<p class="small muted">'+(RO?'':'Este día non se pode cambiar aquí. ')+'</p>';
+  if(!RO&&acts.length)$('shActs').insertAdjacentHTML('beforeend','<p class="small muted" style="grid-column:1/-1">Para poñer exames, sesións, recitais ou probas, usa «Marcar no calendario».</p>');
+  sheet.classList.add('open');$('shClose').focus();
+}
+function closeSheet(){sheet.classList.remove('open');cur=null}
+$('shActs').addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');if(!b||!cur||RO)return;const a=b.dataset.act,s=cur;
+  if(a==='cen'){toggle(S.centro,s);S.extra=S.extra.filter(x=>x!==s)}
+  else if(a==='ext'){toggle(S.extra,s);S.centro=S.centro.filter(x=>x!==s)}
+  else if(a==='e1')S.e1=s;
+  else if(a==='e2')S.e2=s;
+  else if(a==='e3')S.e3=s;
+  else if(a==='loc'){const i=S.locals.findIndex(l=>l.d===s);if(i>=0)S.locals.splice(i,1);else S.locals.push({d:s,n:'Festivo local'})}
+  else if(a.indexOf('x:')===0){delete S.acts[a.slice(2)]}
+  else if(a[0]==='p'){const i=+a.slice(1);if(S.props[i]===s)S.props[i]='';else setProp(i,s)}
+  commit();openSheet(s);
+});
+$('shClose').onclick=closeSheet;
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet()});
+$('months').addEventListener('click',e=>{
+  const b=e.target.closest('.d');if(!b)return;
+  if(!RO&&tool){applyTool(b.dataset.s);return}
+  openSheet(b.dataset.s);
+});
+
+/* Eventos */
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+  document.querySelectorAll('section.tab').forEach(x=>x.classList.toggle('on',x.id==='t-'+b.dataset.t));
+  closeSheet();
+  if(b.dataset.t==='prop'&&CFG&&adminKey())loadVote();
+});
+$('scopeSeg').addEventListener('click',e=>{const b=e.target.closest('[data-scope]');if(b){S.scope=b.dataset.scope;save();renderAll()}});
+$('layoutSeg').addEventListener('click',e=>{const b=e.target.closest('[data-layout]');if(b){S.layout=b.dataset.layout;save();renderAll()}});
+$('mSel').onchange=e=>{S.mes=+e.target.value;save();renderAll()};
+$('mPrev').onclick=()=>{S.mes=Math.max(0,S.mes-1);save();renderAll()};
+$('mNext').onclick=()=>{S.mes=Math.min(10,S.mes+1);save();renderAll()};
+$('zMinus').onclick=()=>{S.z=Math.max(.8,Math.round((S.z-.1)*10)/10);save();renderAll()};
+$('zPlus').onclick=()=>{S.z=Math.min(1.8,Math.round((S.z+.1)*10)/10);save();renderAll()};
+$('projBtn').onclick=()=>{S.proj=!S.proj;if(S.proj&&S.z<1.2)S.z=1.25;if(!S.proj)S.z=1;save();renderAll()};
+$('themeBtn').onclick=()=>{S.theme=({auto:'light',light:'dark',dark:'auto'})[S.theme];save();renderAll()};
+$('tool').onchange=e=>{tool=e.target.value;pend=null;renderToolHint()};
+$('toolDone').onclick=()=>{tool='';pend=null;renderToolHint()};
+
+$('t-prop').addEventListener('click',e=>{
+  const t=e.target.closest('button');if(!t)return;const d=t.dataset;
+  if(t.id==='addSlot'){if(S.props.length<8){S.props.push('');commit()}}
+  if(d.unprop!==undefined){S.props[+d.unprop]='';commit()}
+  if(d.delslot!==undefined){S.props.splice(+d.delslot,1);commit()}
+  if(d.fix){S.centro=[d.fix];S.props=S.props.map(x=>x===d.fix?'':x);commit()}
+  if(d.uncen){S.centro=S.centro.filter(x=>x!==d.uncen);commit()}
+  if(t.id==='addCand'){S.cands.push({d:'',n:''});commit()}
+  if(d.cdel!==undefined){S.cands.splice(+d.cdel,1);commit()}
+  if(d.cprop!==undefined){const c=S.cands[+d.cprop];if(c&&c.d&&addProp(c.d))commit()}
+  if(d.cunprop!==undefined){const c=S.cands[+d.cunprop];if(c){const i=S.props.indexOf(c.d);if(i>=0)S.props[i]='';commit()}}
+  if(d.addcand){S.cands.push({d:d.addcand,n:''});commit()}
+  if(d.tp){S.tally[d.tp]=(S.tally[d.tp]||0)+1;save();renderTally()}
+  if(d.tm){S.tally[d.tm]=Math.max(0,(S.tally[d.tm]||0)-1);save();renderTally()}
+});
+$('t-prop').addEventListener('change',e=>{
+  const t=e.target,d=t.dataset;
+  if(d.pdate!==undefined){const i=+d.pdate;ensureSlots(i);if(t.value)setProp(i,t.value);else S.props[i]='';commit()}
+  if(d.cd!==undefined){S.cands[+d.cd].d=t.value;commit()}
+  if(d.cn!==undefined){S.cands[+d.cn].n=t.value;save()}
+});
+$('tallyReset').onclick=()=>{S.tally={};save();renderTally()};
+$('autoBal').onclick=()=>{autoBal();commit()};
+$('autoVac').onclick=()=>{autoVac();commit()};
+$('e1').onchange=e=>{if(e.target.value){S.e1=e.target.value;commit()}};
+$('e2').onchange=e=>{if(e.target.value){S.e2=e.target.value;commit()}};
+$('e3').onchange=e=>{const v=e.target.value;if(!v)return;if(v<=S.e2){toast('A 3ª avaliación debe acabar despois da 2ª.');commit();return}S.e3=v;commit()};
+$('startSel').onchange=e=>{S.start=e.target.value;commit()};
+$('locals').addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.ld!==undefined){S.locals[+t.dataset.ld].d=t.value;commit()}
+  if(t.dataset.ln!==undefined){S.locals[+t.dataset.ln].n=t.value||'Festivo local';save();renderProp();renderMonths()}
+});
+$('locals').addEventListener('click',e=>{const b=e.target.closest('[data-ldel]');if(b){S.locals.splice(+b.dataset.ldel,1);commit()}});
+$('addLocal').onclick=()=>{S.locals.push({d:'',n:'Festivo local'});save();renderAjustes()};
+$('extras').addEventListener('click',e=>{const b=e.target.closest('[data-unext]');if(b){S.extra=S.extra.filter(x=>x!==b.dataset.unext);commit()}});
+$('hitosChk').onchange=e=>{S.hitos=e.target.checked;save();renderMonths()};
+$('printBtn').onclick=()=>window.print();
+$('resetBtn').onclick=()=>{if(confirm('Borrar todos os cambios e volver ao calendario oficial?')){S=clone(DEF);commit()}};
+$('copyBtn').onclick=()=>{
+  const L=lectivos(),c=wcount(L);
+  let t='Curso 2026-27\nDías lectivos: '+L.length+'\n'+WD.map((w,i)=>w+': '+c[i]).join(', ')+'\n';
+  t+='Inicio: '+fmtL(S.start)+'. Fin: '+fmtL(END)+'\n';
+  if(S.centro.length)t+='Día(s) do centro: '+S.centro.slice().sort().map(fmtL).join('; ')+'\n';
+  const E=[[],[],[],[]];L.forEach(s=>{const k=evalOf(s);E[k?k-1:3].push(s)});
+  E.forEach((e,i)=>{if(e.length)t+=(i<3?(i+1)+'ª avaliación':'Ampliación e recuperación (con clase)')+': '+fmt(e[0])+' – '+fmt(e[e.length-1])+' ('+e.length+' días; '+wcount(e).map((n,j)=>WD3[j]+' '+n).join(', ')+')\n'});
+  const AL=ACT.filter(a=>actRange(a.id));
+  if(AL.length)t+='Exames e probas:\n'+AL.map(a=>{const r=actRange(a.id);return '- '+a.n+': '+(r[0]===r[1]?fmt(r[0]):fmt(r[0])+' – '+fmt(r[1]))}).join('\n')+'\n';
+  const msg=$('copyMsg');
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>msg.textContent='Resumo copiado.',()=>{msg.textContent='Non se puido copiar automaticamente. Aquí o tes: '+t});
+};
+$('t-exa').addEventListener('change',e=>{
+  const t=e.target,d=t.dataset;
+  if(d.ad){if(t.value)S.acts[d.ad]={a:t.value};else delete S.acts[d.ad];commit()}
+  if(d.ara||d.arb){
+    const id=d.ara||d.arb,c0=S.acts[id]||{};let a=c0.a,b=c0.b||c0.a;
+    const v=t.value;
+    if(!v){
+      if(d.ara)delete S.acts[id];
+      else if(a)S.acts[id]={a:a,b:a};
+      commit();return;
+    }
+    if(d.ara){
+      /* ao mover o inicio, o final móvese os mesmos días (mantén a duración) */
+      if(a&&b){b=add(b,Math.round((parse(v)-parse(a))/86400000))}else b=v;
+      a=v;
+    }else{
+      if(a&&v<a){toast('A data final non pode ser anterior á inicial.');commit();return}
+      if(!a)a=v;
+      b=v;
+    }
+    S.acts[id]={a:a,b:b};commit();
+  }
+});
+$('t-exa').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.adel){delete S.acts[b.dataset.adel];commit()}
+  if(b.id==='exaProp'){
+    const ids=['ex1','se1','ex2','se2','rec','ex3a','se3a','ex3b','se3b'];
+    if(ids.some(id=>S.acts[id])&&!confirm('Isto substitúe as datas que xa puxeches para as avaliacións (exames, sesións e recitais). Continuar?'))return;
+    proposeP();commit();
+  }
+  if(b.id==='exaClear'){if(confirm('Borrar todas as datas de exames e probas?')){S.acts={};commit()}}
+});
+
+/* Cores */
+const COLORS=[
+ ['Tipos de día',[['lect','Lectivo'],['fest','Festivo'],['local','Festivo local'],['vac','Vacacións'],['ens','Día do Ensino'],['cen','Día do centro'],['ext','Outro non lectivo'],['act','Sen clase, con actividade'],['we','Fin de semana']]],
+ ['Avaliacións (franxa de abaixo de cada día)',[['e1','1ª avaliación'],['e2','2ª avaliación'],['e3','3ª avaliación'],['e4','Ampliación e recuperación (xuño)']]],
+ ['Exames e probas (franxa de arriba)',[['c-ex','Semana de exames'],['c-se','Sesión de avaliación'],['c-rc','Recital'],['c-ac','Probas de acceso'],['c-xt','Exames extraordinarios']]],
+ ['Propostas',LET.map((l,i)=>['o'+(i+1),'Proposta '+l])]
+];
+const SOLID=['lect','fest','local','vac','ens','cen','ext'];
+const HEX=/^#[0-9a-f]{6}$/i;
+function textOn(hex){const n=parseInt(hex.slice(1),16),r=n>>16,g=(n>>8)&255,b=n&255;return (0.2126*r+0.7152*g+0.0722*b)>140?'#111B2E':'#FFFFFF'}
+function lighten(hex,p){const n=parseInt(hex.slice(1),16),f=x=>Math.round(x+(255-x)*p).toString(16).padStart(2,'0');return '#'+f(n>>16)+f((n>>8)&255)+f(n&255)}
+function applyColors(){
+  const st=document.documentElement.style;if(!st||!st.setProperty)return;
+  COLORS.forEach(g=>g[1].forEach(c=>{st.removeProperty('--'+c[0]);st.removeProperty('--'+c[0]+'-t')}));
+  st.removeProperty('--local2');
+  Object.keys(S.colors).forEach(k=>{
+    const v=S.colors[k];if(!HEX.test(v))return;
+    st.setProperty('--'+k,v);
+    if(SOLID.includes(k))st.setProperty('--'+k+'-t',textOn(v));
+    if(k==='local')st.setProperty('--local2',lighten(v,.22));
+  });
+}
+function curColor(k){
+  if(S.colors[k]&&HEX.test(S.colors[k]))return S.colors[k];
+  try{const v=getComputedStyle(document.documentElement).getPropertyValue(k==='lect'?'--card':(k==='act'?'--we':'--'+k)).trim();if(HEX.test(v))return v}catch(e){}
+  return '#888888';
+}
+function renderColors(){
+  const box=$('colorBox');if(!box)return;
+  box.innerHTML=COLORS.map(g=>'<h3 style="margin-top:.8rem">'+esc(g[0])+'</h3>'+g[1].map(c=>'<div class="crow"><input type="color" data-col="'+c[0]+'" value="'+curColor(c[0])+'" aria-label="Cor de '+esc(c[1])+'"><span>'+esc(c[1])+'</span><button class="btn sm" data-colreset="'+c[0]+'"'+(S.colors[c[0]]?'':' disabled')+'>Orixinal</button></div>').join('')).join('');
+}
+$('colorBox').addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.col;if(!k)return;S.colors[k]=e.target.value;save();applyColors()});
+$('colorBox').addEventListener('change',e=>{if(e.target.dataset&&e.target.dataset.col)renderColors()});
+$('colorBox').addEventListener('click',e=>{const b=e.target.closest('[data-colreset]');if(!b)return;delete S.colors[b.dataset.colreset];save();applyColors();renderColors()});
+$('colReset').onclick=()=>{S.colors={};save();applyColors();renderColors()};
+
+/* Copia de seguranza */
+function backupJSON(){return JSON.stringify({app:'calendario-curso-2627',version:1,exportado:ymd(new Date()),data:S},null,1)}
+async function bkDownload(){
+  const text=backupJSON(),name='calendario-2026-27-'+ymd(new Date())+'.json';
+  try{
+    if(window.claude&&window.claude.use){
+      const dl=await window.claude.use('downloads');
+      if(dl){await dl.save({filename:name,data:text});toast('Copia gardada.');return}
+    }
+  }catch(e){if(e&&e.code==='declined')return}
+  try{
+    const b=new Blob([text],{type:'application/json'}),a=document.createElement('a');
+    a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Copia descargada.');
+  }catch(e){$('impTxt').value=text;toast('Non se puido descargar: a copia está na caixa de texto, cópiaa a man.')}
+}
+async function bkCopy(){
+  const text=backupJSON();
+  try{await navigator.clipboard.writeText(text);toast('Copia no portapapeis. Pégaa nun documento ou nunha nota.')}
+  catch(e){$('impTxt').value=text;toast('Copia a man o texto da caixa.')}
+}
+function importText(t){
+  let o;try{o=JSON.parse(t)}catch(e){toast('Ese texto non é unha copia válida.');return}
+  const d=o&&o.data&&typeof o.data==='object'?o.data:o;
+  if(!d||typeof d!=='object'||!('acts' in d||'props' in d||'start' in d||'e1' in d)){toast('Non parece unha copia deste calendario.');return}
+  if(!confirm('Isto substitúe os datos actuais polos da copia. Continuar?'))return;
+  S=Object.assign(clone(DEF),d);normState();commit();toast('Copia importada.');
+}
+$('bkDown').onclick=bkDownload;
+$('bkCopy').onclick=bkCopy;
+$('impGo').onclick=()=>{const t=($('impTxt').value||'').trim();if(t)importText(t);else toast('Pega primeiro o texto da copia.')};
+$('impFile').onchange=e=>{
+  const f=e.target.files&&e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>importText(String(r.result||''));r.onerror=()=>toast('Non se puido ler o ficheiro.');r.readAsText(f);
+  e.target.value='';
+};
+
+/* ================= Votación (Supabase) ================= */
+const ERR={clave_incorrecta:'Clave incorrecta.',votacion_pechada:'A votación non está aberta agora.',pin_incorrecto:'Ligazón ou código non válido. Escanea de novo o QR.',xa_votou:'Este dispositivo xa votou nesta ronda.',opcion_invalida:'Opción non válida.',dispositivo_invalido:'Non se puido identificar o dispositivo. Recarga a páxina.',datas_invalidas:'A hora de peche debe ser posterior á de apertura (e futura).'};
+function errMsg(e){const m=(e&&e.message)||'';for(const k in ERR)if(m.indexOf(k)>=0)return ERR[k];return 'Non se puido conectar coa votación. Téntao de novo.'}
+async function rpc(fn,args){
+  const r=await fetch(CFG.url.replace(/\/$/,'')+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'Content-Type':'application/json',apikey:CFG.key,Authorization:'Bearer '+CFG.key},body:JSON.stringify(args||{})});
+  const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(x){}
+  if(!r.ok){const e=new Error((j&&(j.message||j.hint))||('Erro '+r.status));throw e}
+  return j;
+}
+function adminKey(){try{return sessionStorage.getItem('calkey')||''}catch(e){return ''}}
+function setKey(k){try{if(k)sessionStorage.setItem('calkey',k);else sessionStorage.removeItem('calkey')}catch(e){}}
+function askKey(){const k=prompt('Clave de administración');if(k){setKey(k);return true}return false}
+let srvOff=0;
+const srvNow=()=>Date.now()+srvOff;
+function localInput(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
+function fmtDT(iso){const d=new Date(iso);return d.getDate()+' '+MS[d.getMonth()]+' '+pad(d.getHours())+':'+pad(d.getMinutes())}
+function cd(iso){const s=Math.max(0,Math.round((Date.parse(iso)-srvNow())/1000));return Math.floor(s/60)+':'+pad(s%60)}
+function tickCountdowns(){document.querySelectorAll('[data-until]').forEach(el=>{el.textContent=cd(el.dataset.until)})}
+
+let vs=null,vmsg='';
+const vf={abre:'now',abreAt:'',pecha:'man',min:5,pechaAt:'',pub:true};
+async function loadVote(){
+  if(!CFG||!adminKey())return;
+  try{
+    vs=await rpc('ccc_admin_estado',{p_clave:adminKey()});
+    if(vs&&vs.agora)srvOff=Date.parse(vs.agora)-Date.now();
+    vmsg='';
+  }catch(e){vmsg=errMsg(e);if(/clave_incorrecta/.test((e&&e.message)||'')){setKey('');vs=null}}
+  renderVote();
+}
+function resultsHTML(opcions,conta){
+  const cnt=conta||{};let tot=0;Object.keys(cnt).forEach(k=>tot+=cnt[k]);tot=tot||1;
+  const vals=(opcions||[]).map(o=>cnt[o.l]||0),max=Math.max(0,...vals);
+  let h='';
+  (opcions||[]).forEach(o=>{const i=LET.indexOf(o.l),n=cnt[o.l]||0;h+='<div class="res'+(n===max&&max>0?' win':'')+'" style="--o:'+OCOL[i]+'"><div class="rl"><span>'+o.l+' · '+esc(cap(fmtL(o.d)))+'</span><span>'+n+' ('+Math.round(n/tot*100)+'%)</span></div><div class="rb"><i style="width:'+(n/tot*100)+'%"></i></div></div>'});
+  const x=cnt.X||0;h+='<div class="res" style="--o:var(--muted)"><div class="rl"><span>Abstención</span><span>'+x+' ('+Math.round(x/tot*100)+'%)</span></div><div class="rb"><i style="width:'+(x/tot*100)+'%"></i></div></div>';
+  return h;
+}
+function voteForm(){
+  const np=S.props.filter(Boolean).length;
+  if(!vf.abreAt)vf.abreAt=localInput(new Date(Date.now()+10*60000));
+  if(!vf.pechaAt)vf.pechaAt=localInput(new Date(Date.now()+25*60000));
+  const rad=(name,val,cur,label)=>'<label class="row small"><input type="radio" name="'+name+'" value="'+val+'"'+(cur===val?' checked':'')+'> '+label+'</label>';
+  return '<h3>Nova votación</h3>'+
+   '<div class="fld"><label>Cando abre</label><div class="row">'+rad('vAbre','now',vf.abre,'Agora')+rad('vAbre','prog',vf.abre,'Programar')+'<input type="datetime-local" id="vAbreAt" value="'+vf.abreAt+'"'+(vf.abre==='prog'?'':' disabled')+'></div></div>'+
+   '<div class="fld"><label>Cando pecha</label><div class="row">'+rad('vPecha','man',vf.pecha,'A man')+rad('vPecha','min',vf.pecha,'En')+'<input type="number" id="vMin" min="1" max="600" value="'+vf.min+'" style="width:4.5rem"'+(vf.pecha==='min'?'':' disabled')+'> <span class="small">minutos desde que abre</span>'+rad('vPecha','prog',vf.pecha,'Programar')+'<input type="datetime-local" id="vPechaAt" value="'+vf.pechaAt+'"'+(vf.pecha==='prog'?'':' disabled')+'></div></div>'+
+   '<label class="row small"><input type="checkbox" id="vPub"'+(vf.pub?' checked':'')+'> Amosar os resultados a quen vota cando se peche</label>'+
+   '<div class="row" style="margin-top:.6rem"><button class="btn pri" id="vOpen"'+(np<2?' disabled':'')+'>Crear votación coas '+np+' propostas</button></div>'+
+   (np<2?'<p class="small muted">Necesitas polo menos dúas propostas con data.</p>':'');
+}
+function renderVote(){
+  const box=$('voteBox');if(!box)return;
+  if(!CFG){box.innerHTML='<p class="small muted">Votar desde os móbiles (QR ou ligazón) precisa da versión publicada no teu Vercel con Supabase; o README do paquete explica como. Mentres tanto, usa o reconto a man.</p>';return}
+  if(!adminKey()){box.innerHTML='<p class="small">Para abrir, pechar e axustar votacións, entra coa clave de administración.</p><button class="btn pri" id="vLogin">Entrar como administración</button>'+(vmsg?'<p class="small note">'+esc(vmsg)+'</p>':'');return}
+  const st=vs,ES={aberta:'aberta',programada:'programada',pechada:'pechada'};
+  let h='<div class="row" style="justify-content:space-between"><span class="small">'+(st?('<b>'+(st.ronda?'Ronda '+st.ronda:'Sen votacións')+'</b>'+(st.ronda?' · '+ES[st.estado]:'')):'Cargando…')+'</span><span class="row"><button class="btn sm" id="vRefresh">Actualizar</button><button class="btn sm" id="vLogout">Saír</button></span></div>';
+  if(st){
+    const active=st.estado==='aberta'||st.estado==='programada';
+    if(active){
+      const link=location.origin+location.pathname+'?votar=1&k='+st.pin;
+      h+='<div class="panel" style="margin:.8rem 0"><div class="row" style="gap:1rem;align-items:flex-start"><div id="qr" style="min-width:120px"></div><div style="min-width:0">'+
+        (st.estado==='programada'?'<p style="margin:0"><b>Abre o '+fmtDT(st.abre_a)+'</b> (en <span data-until="'+esc(st.abre_a)+'">…</span>)</p>':'<p style="margin:0"><b>Votación aberta</b></p>')+
+        '<p class="small" style="margin:.2rem 0">'+(st.pecha_a?'Pecha o <b>'+fmtDT(st.pecha_a)+'</b> (quedan <span data-until="'+esc(st.pecha_a)+'">…</span>)':'Sen peche automático: péchase a man.')+'</p>'+
+        '<div class="small muted">Código</div><div class="pinbig">'+esc(st.pin)+'</div><div class="small" style="overflow-wrap:anywhere;margin:.3rem 0"><a href="'+esc(link)+'" target="_blank" rel="noopener">'+esc(link)+'</a></div><button class="btn sm" id="vCopy" data-link="'+esc(link)+'">Copiar ligazón</button></div></div></div>';
+      h+='<p><b>'+st.total+'</b> votos na urna</p>';
+      h+='<div class="row"><button class="btn pri" id="vClose">Pechar agora</button>'+
+        (st.estado==='programada'?'<button class="btn" id="vOpenNow">Abrir agora</button>':'')+
+        '<button class="btn" data-plus="2">+2 min</button><button class="btn" data-plus="5">+5 min</button>'+
+        (st.pecha_a?'<button class="btn" id="vNoAuto">Quitar peche automático</button>':'')+'</div>';
+      h+='<label class="row small" style="margin-top:.6rem"><input type="checkbox" id="vPubNow"'+(st.res_publicos?' checked':'')+'> Amosar os resultados a quen vota cando se peche</label>';
+      h+='<p class="small muted">Cada dispositivo só pode votar unha vez. Non se piden nomes e ninguén, tampouco ti, ve que votou cada quen. Os resultados aparecen ao pechar.</p>';
+    }else if(st.ronda>0){
+      h+='<h3>Resultados da ronda '+st.ronda+'</h3>'+resultsHTML(st.opcions,st.conta)+'<p class="small muted">'+st.total+' votos. '+(st.res_publicos?'Quen votou tamén os ve.':'Só os ves ti.')+'</p>';
+      h+='<div class="row"><button class="btn" id="vReopen">Reabrir esta votación</button></div>';
+    }
+    if(!active)h+=voteForm();
+  }
+  if(vmsg)h+='<p class="small note">'+esc(vmsg)+'</p>';
+  box.innerHTML=h;
+  if(st&&(st.estado==='aberta'||st.estado==='programada')&&window.QRCode&&$('qr')){try{$('qr').innerHTML='';new QRCode($('qr'),{text:location.origin+location.pathname+'?votar=1&k='+st.pin,width:150,height:150})}catch(e){}}
+  tickCountdowns();
+}
+async function vCall(fn,args){
+  try{await rpc(fn,Object.assign({p_clave:adminKey()},args||{}));vmsg=''}
+  catch(x){vmsg=errMsg(x);if(/clave_incorrecta/.test((x&&x.message)||''))setKey('')}
+  await loadVote();
+}
+$('voteBox').addEventListener('click',async e=>{
+  const b=e.target.closest('button');if(!b||!CFG)return;
+  if(b.id==='vLogin'){if(askKey())loadVote()}
+  if(b.id==='vLogout'){setKey('');vs=null;renderVote()}
+  if(b.id==='vRefresh')loadVote();
+  if(b.id==='vCopy'){try{await navigator.clipboard.writeText(b.dataset.link);toast('Ligazón copiada.')}catch(x){toast('Copia a ligazón a man.')}}
+  if(b.id==='vOpen'){
+    const ops=S.props.map((d,i)=>d?{l:LET[i],d:d}:null).filter(Boolean);
+    if(vf.abre==='prog'&&!vf.abreAt){toast('Pon a hora de apertura.');return}
+    if(vf.pecha==='prog'&&!vf.pechaAt){toast('Pon a hora de peche.');return}
+    await vCall('ccc_admin_abrir',{
+      p_opcions:ops,
+      p_abre_a:vf.abre==='prog'?new Date(vf.abreAt).toISOString():null,
+      p_pecha_a:vf.pecha==='prog'?new Date(vf.pechaAt).toISOString():null,
+      p_minutos:vf.pecha==='min'?(parseInt(vf.min,10)||null):null,
+      p_res_publicos:!!vf.pub
+    });
+  }
+  if(b.id==='vClose'){if(confirm('Pechar a votación agora?'))await vCall('ccc_admin_pechar')}
+  if(b.id==='vReopen')await vCall('ccc_admin_reabrir');
+  if(b.id==='vOpenNow')await vCall('ccc_admin_axustar',{p_minutos:null,p_quitar_pecha:false,p_res_publicos:null,p_abrir_agora:true});
+  if(b.id==='vNoAuto')await vCall('ccc_admin_axustar',{p_minutos:null,p_quitar_pecha:true,p_res_publicos:null,p_abrir_agora:false});
+  if(b.dataset.plus)await vCall('ccc_admin_axustar',{p_minutos:+b.dataset.plus,p_quitar_pecha:false,p_res_publicos:null,p_abrir_agora:false});
+});
+$('voteBox').addEventListener('change',async e=>{
+  const t=e.target;if(!t)return;
+  if(t.name==='vAbre'){vf.abre=t.value;renderVote()}
+  else if(t.name==='vPecha'){vf.pecha=t.value;renderVote()}
+  else if(t.id==='vAbreAt')vf.abreAt=t.value;
+  else if(t.id==='vPechaAt')vf.pechaAt=t.value;
+  else if(t.id==='vMin')vf.min=t.value;
+  else if(t.id==='vPub')vf.pub=t.checked;
+  else if(t.id==='vPubNow')await vCall('ccc_admin_axustar',{p_minutos:null,p_quitar_pecha:false,p_res_publicos:!!t.checked,p_abrir_agora:false});
+});
+let lastPoll=0;
+setInterval(()=>{
+  if(!CFG||RO)return;
+  tickCountdowns();
+  if(!vs||!adminKey())return;
+  const active=vs.estado==='aberta'||vs.estado==='programada';
+  if(!active)return;
+  const edge=(vs.estado==='programada'&&vs.abre_a&&srvNow()>=Date.parse(vs.abre_a))||(vs.pecha_a&&srvNow()>=Date.parse(vs.pecha_a));
+  const tabOn=$('t-prop').classList.contains('on');
+  if((edge||tabOn)&&Date.now()-lastPoll>(edge?2500:5000)){lastPoll=Date.now();loadVote()}
+},1000);
+
+/* Versión do profesorado */
+function pubData(){return {start:S.start,locals:S.locals,centro:S.centro,extra:S.extra,e1:S.e1,e2:S.e2,e3:S.e3,acts:S.acts,hitos:S.hitos,colors:S.colors}}
+function applyPublished(d){
+  if(!d||typeof d!=='object')return;
+  ['start','e1','e2','e3'].forEach(k=>{if(typeof d[k]==='string')S[k]=d[k]});
+  if(d.colors&&typeof d.colors==='object'&&!Array.isArray(d.colors))S.colors=d.colors;
+  ['locals','centro','extra'].forEach(k=>{if(Array.isArray(d[k]))S[k]=d[k]});
+  if(d.acts&&typeof d.acts==='object')S.acts=d.acts;
+  if(typeof d.hitos==='boolean')S.hitos=d.hitos;
+}
+function renderPub(){
+  const box=$('pubBox');if(!box)return;
+  if(!CFG){box.innerHTML='<p class="small muted">Para que o profesorado consulte o calendario cunha ligazón (sen conta de Claude), publica a web no teu Vercel con Supabase. O README explica como.</p>';return}
+  const link=location.origin+location.pathname+'?ver=1';
+  box.innerHTML='<p class="small muted">Publica as datas actuais (inicio, festivos locais, avaliacións, exames e probas, día do centro) nunha ligazón só de lectura.</p><div class="row"><button class="btn pri sm" id="pubGo">Publicar para o profesorado</button><button class="btn sm" id="pubCopy">Copiar ligazón</button></div><div class="small" style="overflow-wrap:anywhere;margin-top:.4rem">'+esc(link)+'</div><p class="small" id="pubMsg"></p>';
+}
+$('pubBox').addEventListener('click',async e=>{
+  const b=e.target.closest('button');if(!b||!CFG)return;
+  if(b.id==='pubCopy'){try{await navigator.clipboard.writeText(location.origin+location.pathname+'?ver=1');toast('Ligazón copiada.')}catch(x){toast('Copia a ligazón a man.')}}
+  if(b.id==='pubGo'){
+    if(!adminKey()&&!askKey())return;
+    try{await rpc('ccc_admin_publicar',{p_clave:adminKey(),p_datos:pubData()});$('pubMsg').textContent='Publicado. O profesorado xa ve estas datas.'}
+    catch(x){$('pubMsg').textContent=errMsg(x);if(/clave_incorrecta/.test((x&&x.message)||''))setKey('')}
+  }
+});
+
+/* ================= Páxina de voto ================= */
+function deviceId(){
+  const k='cal-dev';
+  try{
+    let v=localStorage.getItem(k);
+    if(!v){
+      const a=new Uint8Array(16);
+      if(window.crypto&&window.crypto.getRandomValues)window.crypto.getRandomValues(a);else for(let i=0;i<16;i++)a[i]=Math.floor(Math.random()*256);
+      v=Array.from(a).map(x=>x.toString(16).padStart(2,'0')).join('');
+      localStorage.setItem(k,v);
+    }
+    return v;
+  }catch(e){
+    if(!deviceId._s){deviceId._s='s'+Date.now().toString(16)+Math.random().toString(16).slice(2)+'0000000000'}
+    return deviceId._s;
+  }
+}
+async function initVoter(){
+  $('app').hidden=true;const vp=$('voterPage');vp.hidden=false;
+  const pin=Q.get('k')||'';
+  const say=h=>{vp.innerHTML='<div class="vwrap">'+h+'</div>';tickCountdowns()};
+  if(!CFG){say('<h1>Votación</h1><p class="muted">A votación non está configurada nesta páxina.</p>');return}
+  say('<h1>Votación</h1><p class="muted">Cargando…</p>');
+  try{const pd=await rpc('ccc_publicado');if(pd)applyPublished(pd)}catch(e){}
+  const dev=deviceId(),calLink='<p class="small"><a href="?ver=1">Ver o calendario</a></p>';
+  let st=null,lastKey='',sel='',busy=false;
+  async function draw(){
+    const doneKey='voto-ronda-'+st.ronda;let done=false;try{done=!!localStorage.getItem(doneKey)}catch(e){}
+    if(st.estado==='programada'){
+      say('<h1>Votación</h1><p>A votación abrirá o <b>'+esc(fmtDT(st.abre_a))+'</b> (en <b data-until="'+esc(st.abre_a)+'">…</b>).</p><p class="small muted">Deixa esta páxina aberta: actualízase soa.</p>'+calLink);return;
+    }
+    if(st.estado==='aberta'){
+      const closing=st.pecha_a?'<p class="small">Pecha en <b data-until="'+esc(st.pecha_a)+'">…</b></p>':'';
+      if(done){say('<h1>Votación</h1><div class="note"><b>Voto rexistrado.</b> Grazas.</div>'+closing+calLink);return}
+      const opts=(st.opcions||[]).map(o=>{
+        const i=LET.indexOf(o.l);let eff='';
+        if(info(o.d).t==='lect'){const e=effect(o.d);eff='Descanso de '+e.rest+' días · '+WD[e.wi]+' '+e.before+' → '+e.after}
+        return '<button class="vopt" data-vote="'+o.l+'" style="--o:'+OCOL[i]+'" aria-pressed="false"><span class="small">Proposta '+o.l+'</span><b>'+esc(cap(fmtL(o.d)))+'</b><span class="small">'+esc(eff)+'</span></button>';
+      }).join('');
+      say('<h1>Votación</h1><p>Día non lectivo do centro · curso 2026-27</p>'+closing+'<h3>Escolle unha opción</h3><div class="vopts">'+opts+'<button class="vopt" data-vote="X" style="--o:var(--muted)" aria-pressed="false"><span class="small">Abstención</span><b>Non voto</b></button></div><button class="btn pri" id="vSend" disabled style="width:100%;padding:.8rem">Votar</button><p class="small note" id="vMsg" hidden></p><p class="small muted">Non se che pide o nome. Cada dispositivo pode votar unha vez, e o voto gárdase sen identificación: nin quen organiza sabe o que votaches.</p>'+calLink);
+      sel='';return;
+    }
+    let h='<h1>Votación</h1><p>A votación non está aberta agora.</p>';
+    if(st.ronda>0&&st.res_publicos){try{const r=await rpc('ccc_resultados');if(r)h+='<h3>Resultados</h3>'+resultsHTML(st.opcions,r.conta)}catch(e){}}
+    say(h+calLink);
+  }
+  async function refresh(){
+    if(busy)return;
+    try{st=await rpc('ccc_estado');if(st&&st.agora)srvOff=Date.parse(st.agora)-Date.now()}
+    catch(e){if(!st)say('<h1>Votación</h1><p>'+esc(errMsg(e))+'</p>');return}
+    const key=[st.ronda,st.estado,JSON.stringify(st.opcions),st.res_publicos,st.pecha_a,st.abre_a].join('|');
+    if(key!==lastKey){lastKey=key;await draw()}
+  }
+  vp.addEventListener('click',async e=>{
+    const b=e.target.closest('button');if(!b)return;
+    if(b.dataset.vote){sel=b.dataset.vote;vp.querySelectorAll('.vopt').forEach(x=>x.setAttribute('aria-pressed',x===b));const s=$('vSend');if(s)s.disabled=false}
+    if(b.id==='vSend'&&sel){
+      const txt=sel==='X'?'abstención':'a proposta '+sel;
+      if(!confirm('Votar '+txt+'? Despois non se pode cambiar.'))return;
+      b.disabled=true;busy=true;const m=$('vMsg');
+      try{
+        await rpc('ccc_votar',{p_pin:pin,p_token:dev,p_opcion:sel});
+        try{localStorage.setItem('voto-ronda-'+st.ronda,'1')}catch(x){}
+        await draw();
+      }catch(x){
+        if(/xa_votou/.test((x&&x.message)||'')){try{localStorage.setItem('voto-ronda-'+st.ronda,'1')}catch(y){}}
+        m.hidden=false;m.textContent=errMsg(x);b.disabled=false;
+      }
+      busy=false;
+    }
+  });
+  await refresh();
+  setInterval(refresh,5000);
+  setInterval(tickCountdowns,1000);
+}
+
+/* ================= Arranque ================= */
+if(RO)document.body.classList.add('ro');
+if(MODE==='voto'){initVoter()}
+else{
+  if(RO){$('hdrP').textContent='Datas do curso 2026-27 para o profesorado: días lectivos, festivos, avaliacións, exames e probas.'}
+  ensureEval();renderAll();
+  if(MODE==='ver'&&CFG){rpc('ccc_publicado').then(d=>{if(d){applyPublished(d);S.e1=S.e1||'';ensureEval();renderAll()}}).catch(()=>{})}
+}
+})();
+</script>
+</body>
+</html>
