@@ -301,6 +301,7 @@ input[type=color]{width:2.6rem;height:2.2rem;padding:0;border:1px solid var(--li
 <section class="tab" id="t-prop">
   <div class="panel" id="propPanel">
     <h2>Propostas para o día non lectivo do centro</h2>
+    <p class="small muted">As letras van por orde cronolóxica: A é a data máis temperá do curso. Se cambias unha data ou engades outra, reordénanse soas. O profesorado vé as propostas no calendario automaticamente.</p>
     <p class="small muted" id="cenIntro"></p>
     <div class="slots" id="slots"></div>
     <div class="row noprint" style="margin-top:.7rem"><button class="btn sm" id="addSlot">Engadir outra proposta</button></div>
@@ -532,6 +533,7 @@ function normState(){
   if(!S.acts||typeof S.acts!=='object')S.acts={};
   if(!S.colors||typeof S.colors!=='object'||Array.isArray(S.colors))S.colors={};
   if(!/^\d{4}-\d{2}-\d{2}$/.test(S.start||''))S.start=DEF.start;
+  sortProps();
 }
 normState();
 let synced=false,pushT=null;
@@ -764,6 +766,12 @@ function renderTools(){
 }
 
 /* Propostas */
+function sortProps(){
+  const filled=S.props.filter(Boolean).sort();
+  const n=Math.max(3,S.props.length,filled.length);
+  while(filled.length<n)filled.push('');
+  S.props=filled.slice(0,8);
+}
 function nSlots(){return Math.max(3,S.props.length)}
 function ensureSlots(i){while(S.props.length<=i)S.props.push('')}
 function setProp(i,s){ensureSlots(i);for(let k=0;k<S.props.length;k++)if(S.props[k]===s)S.props[k]='';S.props[i]=s}
@@ -937,7 +945,7 @@ function renderTally(){
   $('tally').innerHTML=h;
 }
 
-function commit(){ensureEval();save();renderAll()}
+function commit(){ensureEval();sortProps();save();renderAll()}
 function renderAll(){
   ensureEval();renderTools();renderCounter();renderLegend();renderSum();renderMonths();
   if(!RO){renderProp();renderAjustes();renderTally();renderVote()}
@@ -1373,7 +1381,7 @@ function setSync(t){const b=$('syncBtn');if(!b)return;b.hidden=!CFG||RO;b.textCo
 async function pushDraft(){
   if(!CFG||RO||!synced||!adminKey())return;
   setSync('gardando…');
-  try{await rpc('ccc_admin_gardar',{p_clave:adminKey(),p_datos:draftData()});const d=new Date();setSync('gardado '+pad(d.getHours())+':'+pad(d.getMinutes()))}
+  try{await rpc('ccc_admin_gardar',{p_clave:adminKey(),p_datos:draftData()});const d=new Date();setSync('gardado '+pad(d.getHours())+':'+pad(d.getMinutes()));syncPropsPublic().catch(()=>{})}
   catch(e){setSync('sen gardar');toast(errMsg(e));if(/clave_incorrecta/.test((e&&e.message)||'')){setKey('');synced=false}}
 }
 async function startSync(){
@@ -1383,8 +1391,23 @@ async function startSync(){
     const d=await rpc('ccc_admin_ler',{p_clave:adminKey()});
     if(d&&typeof d==='object'&&Object.keys(d).length){applyDraft(d);normState();ensureEval();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}synced=true;renderAll();const t=new Date();setSync('cargado '+pad(t.getHours())+':'+pad(t.getMinutes()))}
     else{synced=true;await pushDraft()}
-    loadVote();
+    loadVote();checkPropsPublic().catch(()=>{});
   }catch(e){setSync('sen conectar');toast(errMsg(e));if(/clave_incorrecta/.test((e&&e.message)||''))setKey('')}
+}
+let lastPropsPub=null;
+async function syncPropsPublic(force){
+  if(!CFG||RO||!adminKey())return;
+  const sig=JSON.stringify(S.props);
+  if(!force&&sig===lastPropsPub)return;
+  const cur=(await rpc('ccc_publicado'))||{};
+  cur.props=S.props;
+  await rpc('ccc_admin_publicar',{p_clave:adminKey(),p_datos:cur});
+  lastPropsPub=sig;
+}
+async function checkPropsPublic(){
+  const cur=(await rpc('ccc_publicado'))||{};
+  const pub=JSON.stringify((cur.props||[]).filter(Boolean)),mine=JSON.stringify(S.props.filter(Boolean));
+  if(pub!==mine)await syncPropsPublic(true);else lastPropsPub=JSON.stringify(S.props);
 }
 $('syncBtn').onclick=()=>{if(!adminKey()){askKey();return}if(synced)pushDraft();else startSync()};
 
@@ -1394,7 +1417,7 @@ function applyPublished(d){
   if(!d||typeof d!=='object')return;
   ['start','e1','e2','e3'].forEach(k=>{if(typeof d[k]==='string')S[k]=d[k]});
   if(d.colors&&typeof d.colors==='object'&&!Array.isArray(d.colors))S.colors=d.colors;
-  if(Array.isArray(d.props)){S.props=d.props.slice(0,8).map(x=>typeof x==='string'?x:'');while(S.props.length<3)S.props.push('')}
+  if(Array.isArray(d.props)){S.props=d.props.slice(0,8).map(x=>typeof x==='string'?x:'');while(S.props.length<3)S.props.push('');sortProps()}
   ['locals','centro','extra'].forEach(k=>{if(Array.isArray(d[k]))S[k]=d[k]});
   if(d.acts&&typeof d.acts==='object')S.acts=d.acts;
   if(typeof d.hitos==='boolean')S.hitos=d.hitos;
@@ -1410,7 +1433,7 @@ $('pubBox').addEventListener('click',async e=>{
   if(b.id==='pubCopy'){try{await navigator.clipboard.writeText(location.origin+location.pathname);toast('Ligazón do profesorado copiada.')}catch(x){toast('Copia a ligazón a man.')}}
   if(b.id==='pubGo'){
     if(!adminKey()&&!askKey())return;
-    try{await rpc('ccc_admin_publicar',{p_clave:adminKey(),p_datos:pubData()});$('pubMsg').textContent='Publicado. O profesorado verá estas datas en menos dun minuto.'}
+    try{await rpc('ccc_admin_publicar',{p_clave:adminKey(),p_datos:pubData()});lastPropsPub=JSON.stringify(S.props);$('pubMsg').textContent='Publicado. O profesorado verá estas datas en menos dun minuto.'}
     catch(x){$('pubMsg').textContent=errMsg(x);if(/clave_incorrecta/.test((x&&x.message)||''))setKey('')}
   }
 });
