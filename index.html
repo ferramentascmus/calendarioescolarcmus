@@ -151,7 +151,7 @@ table.t th{font-weight:700;color:var(--muted);font-size:.8rem}
 .dot{display:inline-block;width:.7rem;height:.7rem;border-radius:50%;margin-right:.4rem}
 .fld{display:flex;flex-direction:column;gap:.2rem;margin:.4rem 0}
 .fld label{font-size:.85rem;color:var(--muted)}
-input[type=date],input[type=text],select,textarea{border:1px solid var(--line);background:var(--paper);border-radius:.5rem;padding:.4rem .55rem;max-width:100%;min-width:0}
+input[type=date],input[type=time],input[type=text],select,textarea{border:1px solid var(--line);background:var(--paper);border-radius:.5rem;padding:.4rem .55rem;max-width:100%;min-width:0}
 textarea{width:100%}
 .lrow{display:grid;grid-template-columns:auto 1fr auto;gap:.4rem;margin-bottom:.4rem}
 ul.clean{list-style:none;padding:0;margin:0}
@@ -199,6 +199,45 @@ input[type=color]{width:2.6rem;height:2.2rem;padding:0;border:1px solid var(--li
 .qrfull[hidden]{display:none}
 .qrfull .qrbox canvas{width:min(70vmin,620px)!important}
 .qrfull h2{font-size:clamp(1.4rem,4vw,2.4rem);margin:0}
+.calsw{display:flex;gap:.4rem;overflow-x:auto;padding:.3rem 0 .6rem;scrollbar-width:none}
+.calsw[hidden]{display:none}
+.calpill{border:2px solid var(--c);background:var(--card);color:var(--ink);border-radius:999px;padding:.4rem .9rem;white-space:nowrap}
+.calpill.on{background:var(--c);color:var(--t,#fff);font-weight:700}
+.calpill small{opacity:.8;font-weight:400}
+.evhead{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between;margin:.4rem 0 .6rem}
+.evhead h2{margin:0;display:flex;align-items:center;gap:.5rem}
+.evdot{display:inline-block;width:.9rem;height:.9rem;border-radius:50%;background:var(--c)}
+.evgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:.25rem}
+.evh{font-size:.75rem;color:var(--muted);text-align:center}
+.evd{border:1px solid var(--line);background:var(--card);border-radius:.5rem;min-height:4.8rem;padding:.2rem;text-align:left;display:flex;flex-direction:column;gap:.15rem;min-width:0;overflow:hidden}
+.evd.we{background:var(--we)}
+.evd.blank{border:0;background:transparent;min-height:0}
+.evd .n{font-weight:700;font-size:.85rem}
+.evd.f-fest .n,.evd.f-local .n{color:var(--fest)}
+.evd.f-vac{box-shadow:inset 0 3px 0 var(--vac)}
+.evd.f-fest,.evd.f-local{box-shadow:inset 0 3px 0 var(--fest)}
+.evd.f-cen{box-shadow:inset 0 3px 0 var(--cen)}
+.evd.today{outline:3px dashed var(--muted);outline-offset:1px}
+.evt{display:block;font-size:.7rem;line-height:1.15;background:var(--c);color:var(--t,#fff);border-radius:.25rem;padding:.05rem .25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.evt.sol{background:transparent;color:var(--ink);border:1px dashed var(--c)}
+.evt.canc{text-decoration:line-through;opacity:.55}
+.evm{font-size:.7rem;color:var(--muted)}
+.evdots{display:none;gap:.15rem;flex-wrap:wrap}
+.evdots i{width:.5rem;height:.5rem;border-radius:50%;background:var(--c)}
+.evc{border:1px solid var(--line);border-left:6px solid var(--c);background:var(--card);border-radius:.6rem;padding:.6rem .8rem;margin-bottom:.6rem}
+.evc.canc b{text-decoration:line-through;opacity:.7}
+.evc.sol{border-left-style:dashed}
+.agm{font:800 1.1rem var(--display);margin:1rem 0 .4rem}
+.chipf{border:2px solid var(--c);background:var(--card);border-radius:999px;padding:.2rem .7rem;font-size:.88rem}
+.chipf[aria-pressed="true"]{background:var(--c);color:var(--t,#fff)}
+.crow2{display:grid;grid-template-columns:auto 1fr;gap:.4rem .6rem;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--line)}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}
+.modal[hidden]{display:none}
+.modal-in{background:var(--card);width:100%;max-width:40rem;max-height:92vh;overflow:auto;border-radius:1rem 1rem 0 0;padding:1rem}
+@media(min-width:700px){.modal{align-items:center}.modal-in{border-radius:1rem}}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.frow>*{min-width:0}
+@media(max-width:560px){.frow{grid-template-columns:1fr}.evt{display:none}.evdots{display:flex}.evd{min-height:3.2rem}}
 .pinbig{font:800 2rem var(--display);letter-spacing:.1em}
 #qr canvas,#qr img{max-width:100%;height:auto}
 
@@ -244,11 +283,14 @@ input[type=color]{width:2.6rem;height:2.2rem;padding:0;border:1px solid var(--li
   </div>
   <div class="row noprint">
     <button class="btn" id="syncBtn" hidden>Servidor</button>
+    <button class="btn" id="pubBtn" hidden>Publicar</button>
   </div>
 </header>
 
 <div id="voteBanner" class="vbanner" hidden></div>
 
+<div id="calSwitch" class="calsw noprint"></div>
+<div id="schoolWrap">
 <div class="counter" aria-live="polite"><div class="counter-in" id="counter"></div></div>
 
 <nav class="tabs" role="tablist">
@@ -294,6 +336,7 @@ input[type=color]{width:2.6rem;height:2.2rem;padding:0;border:1px solid var(--li
   </div>
   <div class="sum" id="sum"></div>
   <div class="legend" id="legend"></div>
+  <div id="centroBox"></div>
   <div id="propSum"></div>
   <div id="months"></div>
 </section>
@@ -383,6 +426,13 @@ input[type=color]{width:2.6rem;height:2.2rem;padding:0;border:1px solid var(--li
     <button class="btn sm" id="impGo">Importar do texto</button>
   </div>
   <div class="panel noprint">
+    <h2>Que ve o profesorado</h2>
+    <p class="small muted">Controla o que aparece na vista de consulta. Os cambios publícanse soos (en menos dun minuto). Non se borra nada: só se amosa ou se agocha.</p>
+    <label class="row small"><input type="checkbox" id="shProps"> Amosar as propostas do día non lectivo (A, B, C…)</label>
+    <label class="row small"><input type="checkbox" id="shCounter"> Amosar o contador de días lectivos por día da semana</label>
+    <div class="fld" style="margin-top:.6rem"><label for="cenNote">Nota que acompaña ao día non lectivo do centro</label><textarea id="cenNote" rows="2"></textarea></div>
+  </div>
+  <div class="panel noprint">
     <h2>Versión para o profesorado</h2>
     <div id="pubBox"></div>
   </div>
@@ -429,6 +479,9 @@ input[type=color]{width:2.6rem;height:2.2rem;padding:0;border:1px solid var(--li
     </ul>
   </div>
 </section>
+</div>
+
+<div id="evWrap" hidden></div>
 
 <div class="adminlink noprint" id="adminEntry" hidden><button class="btn sm" id="adminGo">Administración</button></div>
 </div>
@@ -444,6 +497,16 @@ input[type=color]{width:2.6rem;height:2.2rem;padding:0;border:1px solid var(--li
     <div class="acts" id="shActs"></div>
   </div>
 </div>
+<div class="sheet" id="evSheet" role="dialog" aria-modal="false" aria-labelledby="evSheetT">
+  <div class="sheet-in">
+    <div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div><h3 id="evSheetT"></h3><div class="small muted" id="evSheetS"></div></div>
+      <button class="btn sm" id="evSheetX">Pechar</button>
+    </div>
+    <div id="evSheetB" style="margin-top:.7rem;max-height:52vh;overflow:auto"></div>
+  </div>
+</div>
+<div class="modal" id="evModal" hidden><div class="modal-in" id="evModalIn"></div></div>
 <div class="toast" id="toast" role="status"></div>
 <div id="qrFull" class="qrfull" hidden></div>
 
@@ -514,7 +577,7 @@ const ACT=[
 const GRP={p:'Avaliacións parciais (1ª e 2ª)',s:'3ª avaliación · 6º de grao profesional',r:'3ª avaliación · resto do alumnado',x:'Probas de acceso e exames extraordinarios'};
 
 const DEF={start:'2026-09-09',locals:[{d:'2026-10-07',n:'Virxe do Rosario'},{d:'2027-02-09',n:'Martes de Entroido'},{d:'2027-06-24',n:'San Xoán'}],
-  centro:[],extra:[],e1:'',e2:'',e3:'',colors:{},hitos:true,acts:{},props:['','',''],cands:[],scope:'curso',mes:0,layout:'grella',z:1,proj:false,theme:'auto',tally:{}};
+  centro:[],extra:[],e1:'',e2:'',e3:'',colors:{},hitos:true,acts:{},props:['','',''],cands:[],showProps:false,showCounter:false,centroNote:'',cals:[],calsSeed:false,cur:'school',evView:'mes',evMon:monIdx(new Date()),scope:'curso',mes:0,layout:'grella',z:1,proj:false,theme:'auto',tally:{}};
 const KEY='calendario-curso-2627-gl-v1';
 const clone=o=>JSON.parse(JSON.stringify(o));
 let S;
@@ -525,6 +588,12 @@ function normState(){
   while(S.props.length<3)S.props.push('');
   if(!Array.isArray(S.cands))S.cands=[];
   if(!Array.isArray(S.hideSug))S.hideSug=[];
+  S.showProps=S.showProps===true;S.showCounter=S.showCounter===true;
+  if(!Array.isArray(S.cals))S.cals=[];
+  if(!S.calsSeed){if(!S.cals.length)S.cals=seedCals();S.calsSeed=true}
+  S.cals.forEach(c=>{if(!Array.isArray(c.ev))c.ev=[];if(typeof c.pub!=='boolean')c.pub=false});
+  if(typeof S.evMon!=='number'||S.evMon<0||S.evMon>11)S.evMon=monIdx(new Date());
+  if(S.evView!=='mes'&&S.evView!=='axenda')S.evView='mes';
   if(!S.candsSeed){if(!S.cands.length)S.cands=[{d:'2027-01-08',n:''},{d:'2027-02-11',n:''},{d:'2027-03-18',n:''}];S.candsSeed=true}
   if(!Array.isArray(S.locals))S.locals=clone(DEF.locals);
   if(!Array.isArray(S.centro))S.centro=[];
@@ -533,11 +602,21 @@ function normState(){
   if(!S.acts||typeof S.acts!=='object')S.acts={};
   if(!S.colors||typeof S.colors!=='object'||Array.isArray(S.colors))S.colors={};
   if(!/^\d{4}-\d{2}-\d{2}$/.test(S.start||''))S.start=DEF.start;
+  if(typeof S.centroNote!=='string')S.centroNote='';
+  /* Decisión do curso 2026-27 (votación): aplícase unha soa vez na administración */
+  if(!RO&&!S.mig1405){
+    if(!S.centro.includes('2027-05-14'))S.centro.push('2027-05-14');
+    S.extra=S.extra.filter(x=>x!=='2027-05-14');
+    S.props=['2026-11-02','2027-01-08','2027-02-11','2027-03-18','2027-05-14'];
+    S.showProps=false;
+    if(!S.centroNote)S.centroNote='Foi o día máis votado entre as propostas (2 de novembro, 8 de xaneiro, 11 de febreiro, 18 de marzo e 14 de maio) e é o día non lectivo recoñecido para o centro.';
+    S.mig1405=true;
+  }
   sortProps();
 }
 normState();
 let synced=false,pushT=null;
-function save(){if(RO)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(CFG&&synced){clearTimeout(pushT);pushT=setTimeout(pushDraft,1200)}}
+function save(){if(RO)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(CFG&&synced){clearTimeout(pushT);pushT=setTimeout(pushDraft,1200)}try{updatePubBtn()}catch(e){}}
 
 const $=id=>document.getElementById(id);
 const pad=n=>String(n).padStart(2,'0');
@@ -592,10 +671,23 @@ function range(){
 function scopeLabel(){return S.scope==='mes'?cap(MES[(8+S.mes)%12])+' '+(S.mes<4?2026:2027):SCOPE_NAME[S.scope]}
 function voteOpts(){const st=RO?banSt:vs;return (st&&st.opcions&&st.opcions.length&&(st.estado==='aberta'||st.estado==='programada'))?st.opcions:[]}
 function activeProps(){
+  if(RO&&!S.showProps)return ['','','','','','','',''];
   if(S.props.some(Boolean))return S.props;
   const vo=voteOpts();
   if(vo.length){const a=['','','','','','','',''];vo.forEach(o=>{const i=LET.indexOf(o.l);if(i>=0)a[i]=o.d});return a}
   return S.props;
+}
+function renderCentroBox(){
+  const box=$('centroBox');if(!box)return;
+  const L=S.centro.slice().sort();
+  if(!L.length){box.innerHTML='';return}
+  box.innerHTML='<div class="panel"><h3 style="margin-top:0"><span class="dot" style="background:var(--cen)"></span>Día non lectivo do centro</h3>'+(S.centroNote?'<p class="small" style="margin:.2rem 0 .4rem">'+esc(S.centroNote)+'</p>':'')+'<ul class="clean">'+L.map(s=>{
+    let a=s,b=s;
+    while(a>S.start&&info(add(a,-1)).t!=='lect')a=add(a,-1);
+    while(b<END&&info(add(b,1)).t!=='lect')b=add(b,1);
+    const n=Math.round((parse(b)-parse(a))/86400000)+1;
+    return '<li><b>'+esc(cap(fmtL(s)))+'</b>'+(n>1?'<div class="small muted">Sen clase do '+esc(fmtL(a))+' ao '+esc(fmtL(b))+' ('+n+' días seguidos).</div>':'<div class="small muted">Sen clase ese día.</div>')+'</li>';
+  }).join('')+'</ul></div>';
 }
 let lastOptSig='';
 function refreshProps(){const s=JSON.stringify(voteOpts());if(s!==lastOptSig){lastOptSig=s;renderMonths();renderPropSum()}}
@@ -606,7 +698,7 @@ function renderPropSum(){
   if(!items.length){box.innerHTML='';return}
   box.innerHTML='<div class="panel"><h3 style="margin-top:0">Propostas para o día non lectivo do centro</h3><div class="slots">'+items.map(i=>{
     const s=P[i],I=info(s);let eff='';
-    if(I.t==='lect'){const e=effect(s);eff='Descanso de '+e.rest+' días · '+WD[e.wi]+' '+e.before+' → '+e.after+' · '+(e.ev===4?'ampliación e recuperación':e.ev+'ª avaliación')}
+    if(I.t==='lect'){const e=effect(s);eff='Descanso de '+e.rest+' días · '+(RO&&!S.showCounter?'':WD[e.wi]+' '+e.before+' → '+e.after+' · ')+(e.ev===4?'ampliación e recuperación':e.ev+'ª avaliación')}
     else eff='Non é un día lectivo ('+I.n+').';
     return '<div class="slot" style="--o:'+OCOL[i]+'"><div class="row"><span class="let">'+LET[i]+'</span><b>'+esc(cap(fmtL(s)))+'</b></div><div class="small muted" style="margin-top:.3rem">'+esc(eff)+'</div></div>';
   }).join('')+'</div></div>';
@@ -617,7 +709,7 @@ const AMP='Ampliación e recuperación (con clase)';
 function renderCounter(){
   const r=rangeCount(),L=lectivosIn(r[0],r[1]),c=wcount(L),mx=Math.max(...c),mn=Math.min(...c);
   let h='<div class="tot"><b>'+L.length+'</b><span>días lectivos<br>'+esc(scopeLabel())+'</span></div>';
-  c.forEach((n,i)=>{
+  (RO&&!S.showCounter?[]:c).forEach((n,i)=>{
     const cls=(mx!==mn&&n===mx)?' max':(mx!==mn&&n===mn)?' min':'';
     h+='<div class="wd'+cls+'" title="'+WD[i]+': '+n+' días"><div class="n">'+n+'</div><div class="l">'+WD3[i]+'</div><div class="bar" style="width:'+(mx?n/mx*100:0)+'%"></div></div>';
   });
@@ -823,7 +915,7 @@ function offAround(a,dir){let n=0,s=add(a,dir);while(s>=S.start&&s<=END&&info(s)
 function candHTML(c,i){
   const pi=c.d?S.props.indexOf(c.d):-1;
   let eff='';
-  if(c.d){const I=info(c.d);if(I.t==='lect'){const e=effect(c.d);eff='Descanso de '+e.rest+' días · '+WD[e.wi]+' '+e.before+' → '+e.after+' · '+(e.ev===4?'ampliación e recuperación':e.ev+'ª avaliación')}else eff='Non é un día lectivo ('+I.n+').'}
+  if(c.d){const I=info(c.d);if(I.t==='lect'){const e=effect(c.d);eff='Descanso de '+e.rest+' días · '+(RO&&!S.showCounter?'':WD[e.wi]+' '+e.before+' → '+e.after+' · ')+(e.ev===4?'ampliación e recuperación':e.ev+'ª avaliación')}else eff='Non é un día lectivo ('+I.n+').'}
   else eff='Elixe unha data.';
   return '<div class="cand2"><div class="row"><input type="date" data-cd="'+i+'" value="'+(c.d||'')+'" min="2026-09-01" max="2027-07-31" aria-label="Data"><input type="text" data-cn="'+i+'" value="'+esc(c.n||'')+'" placeholder="Nota (quen o propón…)" aria-label="Nota" style="flex:1 1 10rem"></div>'+
     '<div class="small muted">'+esc(eff)+'</div><div class="row noprint">'+
@@ -859,21 +951,22 @@ function renderProp(){
 
 /* Avaliacións */
 function renderEval(){
+  const wdOn=!RO||S.showCounter;
   $('e1').value=S.e1||'';$('e2').value=S.e2||'';$('e3').value=S.e3||'';
   const L=lectivos(),E=[[],[],[],[]];L.forEach(s=>{const k=evalOf(s);E[k?k-1:3].push(s)});
   const tot=L.length||1,post=E[3].length>0;
   let bar='<div class="balance">'+E.map((e,i)=>'<span style="width:'+(e.length/tot*100)+'%;background:'+'var(--e'+(i+1)+')'+'"></span>').join('')+'</div>';
-  let t='<div class="tw"><table class="t"><tr><th>Avaliación</th><th>Desde</th><th>Ata</th><th>Días</th><th>Semanas</th>'+WD3.map(x=>'<th>'+x+'</th>').join('')+'</tr>';
+  let t='<div class="tw"><table class="t"><tr><th>Avaliación</th><th>Desde</th><th>Ata</th><th>Días</th><th>Semanas</th>'+(wdOn?WD3:[]).map(x=>'<th>'+x+'</th>').join('')+'</tr>';
   E.forEach((e,i)=>{
     if(i===3&&!post)return;
     const c=wcount(e),wk=e.length?new Set(e.map(s=>{const d=parse(s);d.setDate(d.getDate()-(d.getDay()+6)%7);return ymd(d)})).size:0;
-    t+='<tr><td><span class="dot" style="background:'+'var(--e'+(i+1)+')'+'"></span>'+(i<3?(i+1)+'ª':'Ampliación e recuperación')+'</td><td>'+(e[0]?fmt(e[0]):'–')+'</td><td>'+(e.length?fmt(e[e.length-1]):'–')+'</td><td><b>'+e.length+'</b></td><td>'+wk+'</td>'+c.map(n=>'<td>'+n+'</td>').join('')+'</tr>';
+    t+='<tr><td><span class="dot" style="background:'+'var(--e'+(i+1)+')'+'"></span>'+(i<3?(i+1)+'ª':'Ampliación e recuperación')+'</td><td>'+(e[0]?fmt(e[0]):'–')+'</td><td>'+(e.length?fmt(e[e.length-1]):'–')+'</td><td><b>'+e.length+'</b></td><td>'+wk+'</td>'+(wdOn?c:[]).map(n=>'<td>'+n+'</td>').join('')+'</tr>';
   });
   t+='</table></div>';
   const lens=E.slice(0,3).map(e=>e.length),diff=Math.max(...lens)-Math.min(...lens);
   let adv='<p class="small">Diferenza entre a avaliación máis longa e a máis curta: <b>'+diff+' días</b>.</p>';
   if(post)adv+='<p class="small muted">Os '+E[3].length+' días lectivos despois do fin da 3ª (xuño) teñen clase: ampliación, recuperación e outras actividades. Non entran nunha avaliación, pero son lectivos e contan no total.</p>';
-  E.slice(0,3).forEach((e,i)=>{const c=wcount(e),mx=Math.max(...c),mn=Math.min(...c);if(mx-mn>=3)adv+='<p class="small muted">Na '+(i+1)+'ª, o '+WD[c.indexOf(mn)].toLowerCase()+' ten '+(mx-mn)+' sesións menos que o '+WD[c.indexOf(mx)].toLowerCase()+'. Afecta ás materias desa xornada.</p>'});
+  if(wdOn)E.slice(0,3).forEach((e,i)=>{const c=wcount(e),mx=Math.max(...c),mn=Math.min(...c);if(mx-mn>=3)adv+='<p class="small muted">Na '+(i+1)+'ª, o '+WD[c.indexOf(mn)].toLowerCase()+' ten '+(mx-mn)+' sesións menos que o '+WD[c.indexOf(mx)].toLowerCase()+'. Afecta ás materias desa xornada.</p>'});
   if(S.e2>='2027-05-10')adv+='<p class="small muted">Lembra que 6º de grao profesional pode avaliarse a partir do 10 de maio.</p>';
   $('evalOut').innerHTML=bar+t+adv;
 }
@@ -930,6 +1023,8 @@ function renderAjustes(){
   $('locals').innerHTML=S.locals.map((l,i)=>'<div class="lrow"><input type="date" data-ld="'+i+'" value="'+l.d+'" min="2026-09-01" max="2027-08-31"><input type="text" data-ln="'+i+'" value="'+esc(l.n)+'" aria-label="Nome do festivo"><button class="btn sm" data-ldel="'+i+'">Quitar</button></div>').join('');
   $('extras').innerHTML=S.extra.length?'<ul class="clean">'+S.extra.slice().sort().map(s=>'<li class="row" style="justify-content:space-between"><span>'+esc(cap(fmtL(s)))+'</span><button class="btn sm" data-unext="'+s+'">Quitar</button></li>').join('')+'</ul>':'<p class="muted">Ningún. Usa «Marcar no calendario» → «Outro día non lectivo».</p>';
   $('hitosChk').checked=!!S.hitos;
+  $('shProps').checked=!!S.showProps;$('shCounter').checked=!!S.showCounter;
+  if(document.activeElement!==$('cenNote'))$('cenNote').value=S.centroNote||'';
   renderColors();renderPub();
 }
 
@@ -949,7 +1044,7 @@ function commit(){ensureEval();sortProps();save();renderAll()}
 function renderAll(){
   ensureEval();renderTools();renderCounter();renderLegend();renderSum();renderMonths();
   if(!RO){renderProp();renderAjustes();renderTally();renderVote()}
-  renderEval();renderExa();renderPropSum();
+  renderEval();renderExa();renderPropSum();renderCentroBox();renderEvents();updatePubBtn();
 }
 
 /* Folla de accións */
@@ -991,7 +1086,7 @@ $('shActs').addEventListener('click',e=>{
   commit();openSheet(s);
 });
 $('shClose').onclick=closeSheet;
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSheet();if(qrFullOpen){qrFullOpen=false;$('qrFull').hidden=true}}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeSheet();closeEvSheet();closeEvModal();if(qrFullOpen){qrFullOpen=false;$('qrFull').hidden=true}}});
 $('months').addEventListener('click',e=>{
   const b=e.target.closest('.d');if(!b)return;
   if(!RO&&tool){applyTool(b.dataset.s);return}
@@ -1054,6 +1149,9 @@ $('locals').addEventListener('change',e=>{
 $('locals').addEventListener('click',e=>{const b=e.target.closest('[data-ldel]');if(b){S.locals.splice(+b.dataset.ldel,1);commit()}});
 $('addLocal').onclick=()=>{S.locals.push({d:'',n:'Festivo local'});save();renderAjustes()};
 $('extras').addEventListener('click',e=>{const b=e.target.closest('[data-unext]');if(b){S.extra=S.extra.filter(x=>x!==b.dataset.unext);commit()}});
+$('shProps').onchange=e=>{S.showProps=e.target.checked;commit()};
+$('shCounter').onchange=e=>{S.showCounter=e.target.checked;commit()};
+$('cenNote').onchange=e=>{S.centroNote=e.target.value.trim();commit()};
 $('hitosChk').onchange=e=>{S.hitos=e.target.checked;save();renderMonths()};
 $('printBtn').onclick=()=>window.print();
 $('resetBtn').onclick=()=>{if(confirm('Borrar todos os cambios e volver ao calendario oficial?')){S=clone(DEF);normState();commit()}};
@@ -1175,6 +1273,324 @@ $('impFile').onchange=e=>{
   const r=new FileReader();r.onload=()=>importText(String(r.result||''));r.onerror=()=>toast('Non se puido ler o ficheiro.');r.readAsText(f);
   e.target.value='';
 };
+
+
+/* ================= Calendarios de eventos (Erasmus, usos externos, reunións, administrativo…) ================= */
+const EV_FROM='2026-09-01',EV_TO='2027-08-31';
+const EST={conf:'Confirmado',sol:'Solicitado',canc:'Cancelado'};
+const REPL={'':'Non se repite',w:'Cada semana',w2:'Cada 15 días',m:'Cada mes'};
+function newId(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,5)}
+function mkEv(o){return Object.assign({id:newId('e'),t:'',d1:'',d2:'',h1:'',h2:'',rep:'',until:'',ex:[],esp:'',ent:'',est:'conf',nota:'',cont:'',int:'',priv:false},o||{})}
+function monIdx(d){const i=(d.getFullYear()-2026)*12+(d.getMonth()-8);return Math.max(0,Math.min(11,i))}
+function seedCals(){
+  let n=0;
+  const A=(t,d1,d2,nota,h1,h2)=>mkEv({id:'s'+(++n),t:t,d1:d1,d2:d2||'',h1:h1||'',h2:h2||'',nota:nota||''});
+  return [
+    {id:'erasmus',n:'Erasmus',c:'#0B7285',pub:false,ev:[]},
+    {id:'externos',n:'Usos externos',c:'#C2185B',pub:false,ev:[]},
+    {id:'reunions',n:'Reunións',c:'#B85400',pub:false,ev:[]},
+    {id:'admin',n:'Administrativo',c:'#364FC7',pub:false,ev:[
+      A('Constitución das mesas parciais (eleccións sindicais)','2026-10-06','','Fonte: circular da DX de Centros e Recursos Humanos (16/09/2026).'),
+      A('Exposición do censo (eleccións sindicais)','2026-10-09','2026-10-19','Fonte: circular da DX de Centros e Recursos Humanos (16/09/2026).'),
+      A('Reclamacións ao censo (ante a Mesa Coordinadora)','2026-10-13','2026-10-20','Fonte: circular da DX de Centros e Recursos Humanos (16/09/2026). Non se reclama no centro.'),
+      A('Límite para solicitar días non lectivos e avaliación inicial','2026-10-16','','Fonte: Orde do 4/06/2026 (DOG 110, 15/06/2026).'),
+      A('Constitución da Xunta Electoral do consello escolar','2026-10-20','2026-10-26','Fonte: Resolución do 27/08/2026 (DOG 168, 4/09/2026). Pode constituírse calquera día deste intervalo.'),
+      A('Voto das familias por Abalar (consello escolar)','2026-11-11','2026-11-17','Fonte: Resolución do 27/08/2026. Desde as 00:00 do 11 ata as 23:59 do 17.'),
+      A('Votación do consello escolar','2026-11-23','2026-11-27','Fonte: Resolución do 27/08/2026. A Xunta Electoral concreta o calendario por sectores.'),
+      A('Votación das eleccións sindicais docentes','2026-12-03','','Fonte: circular da DX de Centros e Recursos Humanos (16/09/2026). Horario: 10:00–14:00 e 16:30–18:30.','10:00','18:30'),
+      A('Informe de seguimento do consello escolar (Anexo II)','2026-12-15','','Fonte: Resolución do 27/08/2026. Remitir ao Departamento Territorial antes do 16/12/2026.'),
+      A('Límite para solicitar calendarios de fin de curso e probas','2027-04-30','','Fonte: Orde do 4/06/2026. Ante a xefatura territorial.'),
+      A('Límite da memoria anual do centro (Inspección)','2027-07-09','','Fonte: Orde do 4/06/2026 (calendario escolar 2026/27).'),
+      A('Actas de avaliación final á disposición da Inspección','2027-07-16','','Fonte: Orde do 4/06/2026 (calendario escolar 2026/27).')
+    ]}
+  ];
+}
+function publicCals(){
+  return S.cals.filter(c=>c.pub).map(c=>({id:c.id,n:c.n,c:c.c,pub:true,ev:(c.ev||[]).filter(e=>!e.priv).map(e=>({id:e.id,t:e.t,d1:e.d1,d2:e.d2,h1:e.h1,h2:e.h2,rep:e.rep,until:e.until,ex:e.ex||[],esp:e.esp,ent:e.ent,est:e.est,nota:e.nota}))}));
+}
+let reqCal=Q.get('cal')||'',evHidden=new Set(),evQ='',evEst='',evPer='prox',evDay='',evEditing=null;
+function visCals(){return RO?S.cals.filter(c=>c.pub):S.cals}
+function visEv(c){return (c.ev||[]).filter(e=>!RO||!e.priv)}
+function curId(){
+  const w=reqCal||S.cur||'school';
+  if(w==='school')return 'school';
+  if(w==='all')return visCals().length?'all':'school';
+  if(w==='mgr')return RO?'school':'mgr';
+  const c=S.cals.find(x=>x.id===w);
+  return c&&(!RO||c.pub)?w:'school';
+}
+function viewCals(){const id=curId();if(id==='all')return visCals().filter(c=>!evHidden.has(c.id));const c=S.cals.find(x=>x.id===id);return c?[c]:[]}
+function evOcc(ev,from,to){
+  const out=[];if(!ev.d1)return out;
+  const dur=ev.d2&&ev.d2>ev.d1?Math.round((parse(ev.d2)-parse(ev.d1))/864e5):0;
+  const starts=[];
+  if(!ev.rep)starts.push(ev.d1);
+  else{
+    const lim=ev.until&&ev.until>=ev.d1?ev.until:EV_TO;
+    if(ev.rep==='w'||ev.rep==='w2'){const st=ev.rep==='w'?7:14;for(let s=ev.d1,k=0;s<=lim&&k<400;s=add(s,st),k++)starts.push(s)}
+    else if(ev.rep==='m'){const d=parse(ev.d1);for(let k=0;k<60;k++){const x=new Date(d.getFullYear(),d.getMonth()+k,d.getDate());const sx=ymd(x);if(sx>lim)break;if(x.getDate()===d.getDate())starts.push(sx)}}
+  }
+  starts.forEach(s=>{
+    if((ev.ex||[]).includes(s))return;
+    for(let i=0;i<=dur;i++){const day=add(s,i);if(day>=from&&day<=to)out.push({date:day,start:s,first:i===0,dur:dur})}
+  });
+  return out;
+}
+function cmpEv(a,b){const x=a.ev.h1||'',y=b.ev.h1||'';return x<y?-1:x>y?1:(a.ev.t<b.ev.t?-1:1)}
+function evMap(cals,from,to){
+  const m={};
+  cals.forEach(c=>visEv(c).forEach(ev=>evOcc(ev,from,to).forEach(o=>{(m[o.date]=m[o.date]||[]).push({c:c,ev:ev,o:o})})));
+  Object.keys(m).forEach(k=>m[k].sort(cmpEv));
+  return m;
+}
+function timeOverlap(a,b){if(!a.h1||!b.h1)return true;const a2=a.h2||'23:59',b2=b.h2||'23:59';return a.h1<b2&&b.h1<a2}
+function conflictsFor(ev,skipId){
+  const out=[];if(!ev.esp||!ev.d1||ev.est==='canc')return out;
+  const sp=ev.esp.trim().toLowerCase(),mine={};
+  evOcc(ev,EV_FROM,EV_TO).forEach(o=>{mine[o.date]=1});
+  S.cals.forEach(c=>(c.ev||[]).forEach(o2=>{
+    if(o2.id===skipId||o2.est==='canc'||!o2.esp||o2.esp.trim().toLowerCase()!==sp||!timeOverlap(ev,o2))return;
+    evOcc(o2,EV_FROM,EV_TO).forEach(x=>{if(mine[x.date])out.push({date:x.date,t:o2.t,c:c.n})});
+  }));
+  return out;
+}
+function evWhen(ev,o){
+  const s=o&&o.start?o.start:ev.d1,dur=o?o.dur:0;
+  let t=dur>0?fmt(s)+' – '+fmt(add(s,dur)):cap(fmtL(s));
+  t+=ev.h1?' · '+ev.h1+(ev.h2?'–'+ev.h2:''):' · Todo o día';
+  return t;
+}
+function evCard(it,admin,showCal){
+  const ev=it.ev,c=it.c;
+  let tags='';
+  if(ev.est!=='conf')tags+='<span class="tag">'+EST[ev.est]+'</span>';
+  if(showCal)tags+='<span class="tag" style="border-color:'+c.c+'">'+esc(c.n)+'</span>';
+  if(ev.rep)tags+='<span class="tag">'+REPL[ev.rep]+(ev.until?' ata '+fmt(ev.until):'')+'</span>';
+  if(ev.esp)tags+='<span class="tag">Espazo: '+esc(ev.esp)+'</span>';
+  if(ev.ent)tags+='<span class="tag">'+esc(ev.ent)+'</span>';
+  if(admin&&ev.priv)tags+='<span class="tag">Oculto ao profesorado</span>';
+  let more='';
+  if(ev.nota)more+='<div class="small" style="margin-top:.3rem">'+esc(ev.nota)+'</div>';
+  if(admin&&ev.cont)more+='<div class="small muted">Contacto: '+esc(ev.cont)+'</div>';
+  if(admin&&ev.int)more+='<div class="small muted">Interno: '+esc(ev.int)+'</div>';
+  let warn='';
+  if(admin){const cf=conflictsFor(ev,ev.id);if(cf.length){const f=cf.slice(0,3).map(x=>fmt(x.date)+' ('+esc(x.t)+')').join('; ');warn='<div class="warn">Coincide no mesmo espazo con: '+f+(cf.length>3?' e '+(cf.length-3)+' máis':'')+'.</div>'}}
+  const btns=admin?'<div class="row" style="margin-top:.4rem"><button class="btn sm" data-edit="'+esc(c.id)+'|'+esc(ev.id)+'">Editar</button>'+(ev.rep&&it.o?'<button class="btn sm" data-exday="'+esc(c.id)+'|'+esc(ev.id)+'|'+it.o.start+'">Quitar só este día</button>':'')+'</div>':'';
+  return '<div class="evc'+(ev.est==='canc'?' canc':'')+(ev.est==='sol'?' sol':'')+'" style="--c:'+c.c+'"><b>'+esc(ev.t)+'</b><div class="small muted">'+esc(evWhen(ev,it.o))+'</div>'+(tags?'<div class="row" style="gap:.3rem;margin-top:.3rem">'+tags+'</div>':'')+more+warn+btns+'</div>';
+}
+
+/* conmutador */
+function renderSwitch(){
+  const sw=$('calSwitch');if(!sw)return;
+  const vc=visCals();
+  sw.hidden=RO&&vc.length===0;
+  const items=[{id:'school',n:'Elección de días non lectivos',c:'#6A1B9A'}].concat(vc.map(c=>({id:c.id,n:c.n,c:c.c,hid:!c.pub})));
+  if(vc.length)items.push({id:'all',n:'Todos os calendarios',c:'#111B2E'});
+  if(!RO)items.push({id:'mgr',n:'+ Calendarios',c:'#56637A'});
+  const cid=curId();
+  sw.innerHTML=items.map(i=>'<button class="calpill'+(cid===i.id?' on':'')+'" data-cal="'+esc(i.id)+'" style="--c:'+i.c+';--t:'+(i.c.charAt(0)==='#'?textOn(i.c):'#fff')+'">'+esc(i.n)+(i.hid?' <small>(oculto)</small>':'')+'</button>').join('');
+}
+function renderEvents(){
+  renderSwitch();
+  const id=curId();
+  $('schoolWrap').hidden=id!=='school';
+  $('evWrap').hidden=id==='school';
+  if(id==='school')return;
+  if(id==='mgr'){renderMgr();return}
+  renderEvView(id);
+}
+function evHeadHTML(id){
+  const c=S.cals.find(x=>x.id===id);
+  const name=id==='all'?'Todos os calendarios':(c?c.n:'');
+  const col=id==='all'?'var(--ink)':(c?c.c:'var(--ink)');
+  const n=viewCals().reduce((a,x)=>a+visEv(x).length,0);
+  return '<div class="evhead"><h2><span class="evdot" style="--c:'+col+'"></span>'+esc(name)+' <small class="muted" style="font:400 .9rem var(--body)">· '+n+' eventos</small></h2>'+
+    '<div class="row noprint"><div class="seg" role="group"><button data-evview="mes" aria-pressed="'+(S.evView==='mes')+'">Mes</button><button data-evview="axenda" aria-pressed="'+(S.evView==='axenda')+'">Axenda</button></div>'+
+    (!RO?'<button class="btn pri" data-addev="'+(id==='all'?'':esc(id))+'|">Engadir evento</button>':'')+'</div></div>';
+}
+function renderEvView(id){
+  let h=evHeadHTML(id);
+  if(id==='all'){
+    h+='<div class="row noprint" style="margin-bottom:.6rem">'+visCals().map(c=>'<button class="chipf" data-hide="'+esc(c.id)+'" aria-pressed="'+(!evHidden.has(c.id))+'" style="--c:'+c.c+';--t:'+textOn(c.c)+'">'+esc(c.n)+'</button>').join('')+'</div>';
+  }
+  h+='<div id="evBody"></div>';
+  $('evWrap').innerHTML=h;
+  renderEvBody();
+}
+function renderEvBody(){
+  const b=$('evBody');if(!b)return;
+  if(S.evView==='axenda')b.innerHTML=agendaHTML();else b.innerHTML=monthHTML();
+}
+function monthHTML(){
+  const mi=S.evMon,y=mi<4?2026:2027,mo=(8+mi)%12,first=new Date(y,mo,1),days=new Date(y,mo+1,0).getDate();
+  const from=ymd(first),to=ymd(new Date(y,mo,days)),mp=evMap(viewCals(),from,to),today=ymd(new Date());
+  let opts='';for(let m=0;m<12;m++){const mm=(8+m)%12;opts+='<option value="'+m+'"'+(m===mi?' selected':'')+'>'+cap(MES[mm])+' '+(m<4?2026:2027)+'</option>'}
+  let g='';WDH.forEach(x=>g+='<div class="evh">'+x+'</div>');
+  const off=(first.getDay()+6)%7;
+  for(let i=0;i<off;i++)g+='<div class="evd blank"></div>';
+  for(let d=1;d<=days;d++){
+    const s=y+'-'+pad(mo+1)+'-'+pad(d),I=info(s),w=dow(s),list=mp[s]||[];
+    const cls='evd'+((w===0||w===6)?' we':'')+(['fest','local','vac','cen'].includes(I.t)?' f-'+I.t:'')+(s===today?' today':'');
+    const chips=list.slice(0,2).map(x=>'<span class="evt'+(x.ev.est==='sol'?' sol':'')+(x.ev.est==='canc'?' canc':'')+'" style="--c:'+x.c.c+';--t:'+textOn(x.c.c)+'">'+(x.ev.h1?esc(x.ev.h1)+' ':'')+esc(x.ev.t)+'</span>').join('');
+    const more=list.length>2?'<span class="evm">+'+(list.length-2)+' máis</span>':'';
+    const dots=list.length?'<span class="evdots">'+list.slice(0,6).map(x=>'<i style="--c:'+x.c.c+'"></i>').join('')+'</span>':'';
+    g+='<button class="'+cls+'" data-day="'+s+'" aria-label="'+esc(cap(fmtL(s))+(list.length?': '+list.length+' eventos':''))+'" title="'+esc(I.n)+'"><span class="n">'+d+'</span>'+chips+more+dots+'</button>';
+  }
+  return '<div class="row noprint" style="margin-bottom:.5rem"><button class="btn sm" data-mon="-1" aria-label="Mes anterior">‹</button><select id="evMonSel" aria-label="Mes">'+opts+'</select><button class="btn sm" data-mon="1" aria-label="Mes seguinte">›</button></div><div class="evgrid">'+g+'</div><p class="small muted">Toca un día para ver o detalle'+(RO?'':' ou engadir un evento')+'. A franxa superior marca festivos, vacacións e o día do centro.</p>';
+}
+function agendaItems(){
+  const today=ymd(new Date()),lim=add(today,30),items=[];
+  viewCals().forEach(c=>visEv(c).forEach(ev=>{
+    const g={};evOcc(ev,EV_FROM,EV_TO).forEach(o=>{g[o.start]=o});
+    Object.keys(g).forEach(st=>{const o=g[st];items.push({c:c,ev:ev,o:{date:st,start:st,dur:o.dur,first:true},st:st,end:add(st,o.dur)})});
+  }));
+  const q=evQ.trim().toLowerCase();
+  return items.filter(it=>{
+    if(evEst&&it.ev.est!==evEst)return false;
+    if(q&&!((it.ev.t+' '+it.ev.esp+' '+it.ev.ent+' '+it.ev.nota).toLowerCase().includes(q)))return false;
+    if(evPer==='prox')return it.end>=today&&it.st<=lim;
+    if(evPer==='pas')return it.end<today;
+    return true;
+  }).sort((a,b)=>a.st<b.st?-1:a.st>b.st?1:cmpEv(a,b));
+}
+function agendaListHTML(){
+  const L=agendaItems();
+  if(!L.length)return '<p class="muted">Non hai eventos con estes filtros.</p>';
+  let out='',last='';
+  L.forEach(it=>{
+    const d=parse(it.st),k=d.getFullYear()+'-'+d.getMonth();
+    if(k!==last){last=k;out+='<div class="agm">'+cap(MES[d.getMonth()])+' '+d.getFullYear()+'</div>'}
+    out+=evCard(it,!RO,curId()==='all');
+  });
+  return out;
+}
+function agendaHTML(){
+  return '<div class="row noprint" style="margin-bottom:.6rem"><select id="evPer" aria-label="Período"><option value="prox"'+(evPer==='prox'?' selected':'')+'>Próximos 30 días</option><option value="todo"'+(evPer==='todo'?' selected':'')+'>Todo o curso</option><option value="pas"'+(evPer==='pas'?' selected':'')+'>Pasados</option></select>'+
+    '<select id="evEst" aria-label="Estado"><option value="">Todos os estados</option>'+Object.keys(EST).map(k=>'<option value="'+k+'"'+(evEst===k?' selected':'')+'>'+EST[k]+'</option>').join('')+'</select>'+
+    '<input type="text" id="evQ" placeholder="Buscar…" value="'+esc(evQ)+'" aria-label="Buscar" style="flex:1 1 10rem"></div><div id="evList">'+agendaListHTML()+'</div>';
+}
+/* folla do día */
+function openEvDay(s){
+  evDay=s;
+  const list=(evMap(viewCals(),s,s)[s])||[];
+  $('evSheetT').textContent=cap(fmtL(s));
+  const I=info(s);$('evSheetS').textContent=I.t==='lect'?'Día lectivo':I.n;
+  let h=list.length?list.map(it=>evCard(it,!RO,curId()==='all')).join(''):'<p class="muted">Sen eventos este día.</p>';
+  if(!RO)h+='<button class="btn pri" data-addev="'+(curId()==='all'?'':esc(curId()))+'|'+s+'">Engadir evento neste día</button>';
+  $('evSheetB').innerHTML=h;
+  $('evSheet').classList.add('open');
+}
+function closeEvSheet(){const e=$('evSheet');if(e)e.classList.remove('open')}
+$('evSheetX').onclick=closeEvSheet;
+/* formulario */
+function closeEvModal(){const m=$('evModal');if(m){m.hidden=true;evEditing=null}}
+function fld(l,x){return '<div class="fld"><label>'+l+'</label>'+x+'</div>'}
+function openEvForm(calId,evId,date){
+  if(RO)return;
+  let ev=null,cal=null;
+  if(evId){S.cals.forEach(c=>(c.ev||[]).forEach(e=>{if(e.id===evId){ev=e;cal=c}}))}
+  const isNew=!ev;
+  if(isNew){ev=mkEv({d1:date||ymd(new Date())});cal=S.cals.find(c=>c.id===calId)||S.cals[0]}
+  if(!cal){toast('Crea primeiro un calendario.');return}
+  evEditing={ev:isNew?null:ev,calId:cal.id};
+  const esps=Array.from(new Set(S.cals.reduce((a,c)=>a.concat((c.ev||[]).map(e=>e.esp)),[]).filter(Boolean)));
+  const v=x=>esc(x||'');
+  $('evModalIn').innerHTML='<h3 style="margin-top:0">'+(isNew?'Novo evento':'Editar evento')+'</h3>'+
+    fld('Calendario','<select id="f_cal">'+S.cals.map(c=>'<option value="'+esc(c.id)+'"'+(c.id===cal.id?' selected':'')+'>'+esc(c.n)+'</option>').join('')+'</select>')+
+    fld('Título','<input type="text" id="f_t" value="'+v(ev.t)+'" placeholder="Ensaio, curso, reunión, mobilidade…">')+
+    '<div class="frow">'+fld('Data de inicio','<input type="date" id="f_d1" value="'+v(ev.d1)+'">')+fld('Data de fin (se dura varios días)','<input type="date" id="f_d2" value="'+v(ev.d2)+'">')+'</div>'+
+    '<div class="frow">'+fld('Hora de inicio (baleiro = todo o día)','<input type="time" id="f_h1" value="'+v(ev.h1)+'">')+fld('Hora de fin','<input type="time" id="f_h2" value="'+v(ev.h2)+'">')+'</div>'+
+    '<div class="frow">'+fld('Repetición','<select id="f_rep">'+Object.keys(REPL).map(k=>'<option value="'+k+'"'+(ev.rep===k?' selected':'')+'>'+REPL[k]+'</option>').join('')+'</select>')+fld('Repetir ata','<input type="date" id="f_until" value="'+v(ev.until)+'">')+'</div>'+
+    '<div class="frow">'+fld('Espazo ou aula','<input type="text" id="f_esp" list="dl_esp" value="'+v(ev.esp)+'"><datalist id="dl_esp">'+esps.map(e=>'<option value="'+esc(e)+'">').join('')+'</datalist>')+fld('Entidade ou proxecto','<input type="text" id="f_ent" value="'+v(ev.ent)+'" placeholder="Concello da Coruña, Amigos da Ópera…">')+'</div>'+
+    fld('Estado','<select id="f_est">'+Object.keys(EST).map(k=>'<option value="'+k+'"'+(ev.est===k?' selected':'')+'>'+EST[k]+'</option>').join('')+'</select>')+
+    fld('Notas (visibles se o calendario se publica)','<textarea id="f_nota" rows="2">'+v(ev.nota)+'</textarea>')+
+    fld('Contacto (só administración)','<input type="text" id="f_cont" value="'+v(ev.cont)+'" placeholder="Persoa, teléfono, correo">')+
+    fld('Notas internas (só administración)','<textarea id="f_int" rows="2">'+v(ev.int)+'</textarea>')+
+    '<label class="row small"><input type="checkbox" id="f_priv"'+(ev.priv?' checked':'')+'> Agochar este evento ao profesorado (aínda que o calendario sexa público)</label>'+
+    '<div id="f_conf"></div>'+
+    '<div class="row" style="margin-top:.8rem"><button class="btn pri" id="f_save">Gardar</button><button class="btn" id="f_cancel">Cancelar</button>'+(isNew?'':'<button class="btn" id="f_dup">Duplicar</button><button class="btn" id="f_del">Eliminar</button>')+'</div>';
+  $('evModal').hidden=false;
+  updateConf();
+}
+function readForm(){
+  const g=id=>$(id);
+  const t=g('f_t').value.trim(),d1=g('f_d1').value;
+  let d2=g('f_d2').value;if(d2&&d2<=d1)d2='';
+  const rep=g('f_rep').value;let until=g('f_until').value;if(until&&d1&&until<d1)until=d1;
+  let h1=g('f_h1').value,h2=g('f_h2').value;if(!h1)h2='';if(h1&&h2&&h2<=h1)h2='';
+  return {t:t,d1:d1,d2:d2,h1:h1,h2:h2,rep:rep,until:rep?until:'',esp:g('f_esp').value.trim(),ent:g('f_ent').value.trim(),est:g('f_est').value,nota:g('f_nota').value.trim(),cont:g('f_cont').value.trim(),int:g('f_int').value.trim(),priv:g('f_priv').checked};
+}
+function updateConf(){
+  const box=$('f_conf');if(!box||!$('f_d1'))return;
+  const f=readForm();
+  const cf=f.d1?conflictsFor(Object.assign(mkEv(),f,{id:evEditing&&evEditing.ev?evEditing.ev.id:'_new'}),evEditing&&evEditing.ev?evEditing.ev.id:'_new'):[];
+  box.innerHTML=cf.length?'<div class="warn">Coincide no mesmo espazo con: '+cf.slice(0,4).map(x=>fmt(x.date)+' ('+esc(x.t)+' · '+esc(x.c)+')').join('; ')+(cf.length>4?' e '+(cf.length-4)+' máis':'')+'.</div>':'';
+}
+function saveEvForm(){
+  const f=readForm();
+  if(!f.t){toast('Pon un título.');return}
+  if(!f.d1){toast('Pon a data de inicio.');return}
+  const base=evEditing&&evEditing.ev?evEditing.ev:mkEv();
+  const ev=Object.assign({},base,f,{ex:base.ex||[]});
+  S.cals.forEach(c=>{c.ev=(c.ev||[]).filter(e=>e.id!==ev.id)});
+  const dst=S.cals.find(c=>c.id===$('f_cal').value)||S.cals[0];
+  dst.ev.push(ev);
+  closeEvModal();closeEvSheet();commit();toast('Evento gardado.');
+}
+$('evModal').addEventListener('click',e=>{
+  if(e.target===$('evModal')){closeEvModal();return}
+  const b=e.target.closest('button');if(!b)return;
+  if(b.id==='f_save')saveEvForm();
+  if(b.id==='f_cancel')closeEvModal();
+  if(b.id==='f_del'&&evEditing&&evEditing.ev){if(confirm('Eliminar este evento? Non se pode desfacer.')){const id=evEditing.ev.id;S.cals.forEach(c=>{c.ev=(c.ev||[]).filter(x=>x.id!==id)});closeEvModal();closeEvSheet();commit();toast('Evento eliminado.')}}
+  if(b.id==='f_dup'&&evEditing&&evEditing.ev){const src=evEditing.ev,cal=evEditing.calId;const cp=mkEv(Object.assign({},src,{id:newId('e'),t:src.t+' (copia)',ex:(src.ex||[]).slice()}));const c=S.cals.find(x=>x.id===cal)||S.cals[0];c.ev.push(cp);closeEvModal();commit();openEvForm(c.id,cp.id);toast('Copia creada.')}
+});
+$('evModal').addEventListener('input',e=>{if(e.target&&e.target.id&&e.target.id.indexOf('f_')===0)updateConf()});
+$('evModal').addEventListener('change',e=>{if(e.target&&e.target.id&&e.target.id.indexOf('f_')===0)updateConf()});
+/* xestión de calendarios */
+function renderMgr(){
+  let h='<div class="panel"><h2>Calendarios</h2><p class="small muted">Cada calendario ten o seu nome, cor e eventos. Só se amosan ao profesorado os que marques como visibles e despois de premer <b>Publicar</b>. Os contactos e as notas internas nunca se publican.</p>';
+  h+=S.cals.map(c=>{
+    const n=(c.ev||[]).length;
+    return '<div class="crow2"><input type="color" data-ccol="'+esc(c.id)+'" value="'+esc(c.c)+'" aria-label="Cor de '+esc(c.n)+'"><input type="text" data-cname="'+esc(c.id)+'" value="'+esc(c.n)+'" aria-label="Nome do calendario"><span></span><div class="row"><label class="row small"><input type="checkbox" data-cpub="'+esc(c.id)+'"'+(c.pub?' checked':'')+'> Visible para o profesorado</label><span class="small muted">'+n+' eventos</span><button class="btn sm" data-ccopy="'+esc(c.id)+'">Copiar ligazón</button><button class="btn sm" data-cdel="'+esc(c.id)+'">Borrar</button></div></div>';
+  }).join('');
+  h+='<div class="row" style="margin-top:.7rem"><button class="btn pri" id="calAdd">Engadir calendario</button></div></div>';
+  $('evWrap').innerHTML=h;
+}
+/* eventos globais do contedor */
+$('calSwitch').addEventListener('click',e=>{const b=e.target.closest('[data-cal]');if(!b)return;reqCal='';S.cur=b.dataset.cal;save();renderAll();window.scrollTo&&window.scrollTo(0,0)});
+$('evWrap').addEventListener('click',async e=>{
+  const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+  if(d.evview){S.evView=d.evview;save();renderEvView(curId())}
+  if(d.mon){S.evMon=Math.max(0,Math.min(11,S.evMon+(+d.mon)));save();renderEvBody()}
+  if(d.day)openEvDay(d.day);
+  if(d.hide){if(evHidden.has(d.hide))evHidden.delete(d.hide);else evHidden.add(d.hide);renderEvView(curId())}
+  if(d.addev!==undefined){const p=d.addev.split('|');openEvForm(p[0]||'',null,p[1]||'')}
+  if(d.edit){const p=d.edit.split('|');openEvForm(p[0],p[1])}
+  if(d.exday){const p=d.exday.split('|');S.cals.forEach(c=>(c.ev||[]).forEach(x=>{if(x.id===p[1]){x.ex=x.ex||[];if(!x.ex.includes(p[2]))x.ex.push(p[2])}}));commit();toast('Día quitado da serie.')}
+  if(b.id==='calAdd'){const col='#'+['0B7285','C2185B','B85400','364FC7','2E7D32','6D4C41'][S.cals.length%6];S.cals.push({id:newId('c'),n:'Novo calendario',c:col,pub:false,ev:[]});commit()}
+  if(d.cdel){const c=S.cals.find(x=>x.id===d.cdel);if(c&&confirm('Borrar o calendario «'+c.n+'» e os seus '+(c.ev||[]).length+' eventos? Non se pode desfacer.')){S.cals=S.cals.filter(x=>x.id!==d.cdel);if(S.cur===d.cdel)S.cur='school';commit()}}
+  if(d.ccopy){try{await navigator.clipboard.writeText(location.origin+location.pathname+'?cal='+d.ccopy);toast('Ligazón copiada.')}catch(x){toast('Copia a ligazón a man.')}}
+});
+$('evWrap').addEventListener('change',e=>{
+  const t=e.target,d=t.dataset||{};
+  if(t.id==='evMonSel'){S.evMon=+t.value;save();renderEvBody()}
+  if(t.id==='evPer'){evPer=t.value;renderEvBody()}
+  if(t.id==='evEst'){evEst=t.value;renderEvBody()}
+  if(d.cpub){const c=S.cals.find(x=>x.id===d.cpub);if(c){c.pub=t.checked;commit()}}
+  if(d.cname){const c=S.cals.find(x=>x.id===d.cname);if(c){c.n=t.value.trim()||c.n;commit()}}
+});
+$('evWrap').addEventListener('input',e=>{
+  const t=e.target,d=t.dataset||{};
+  if(t.id==='evQ'){evQ=t.value;const l=$('evList');if(l)l.innerHTML=agendaListHTML()}
+  if(d.ccol){const c=S.cals.find(x=>x.id===d.ccol);if(c){c.c=t.value;save();renderSwitch()}}
+});
+$('evSheet').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+  if(d.addev!==undefined){const p=d.addev.split('|');closeEvSheet();openEvForm(p[0]||'',null,p[1]||'')}
+  if(d.edit){const p=d.edit.split('|');closeEvSheet();openEvForm(p[0],p[1])}
+  if(d.exday){const p=d.exday.split('|');S.cals.forEach(c=>(c.ev||[]).forEach(x=>{if(x.id===p[1]){x.ex=x.ex||[];if(!x.ex.includes(p[2]))x.ex.push(p[2])}}));commit();toast('Día quitado da serie.');if(evDay)openEvDay(evDay)}
+});
 
 /* ================= Votación (Supabase) ================= */
 const ERR={clave_incorrecta:'Clave incorrecta.',votacion_pechada:'A votación non está aberta agora.',pin_incorrecto:'Ligazón ou código non válido. Escanea de novo o QR.',xa_votou:'Este dispositivo xa votou nesta ronda.',opcion_invalida:'Opción non válida.',dispositivo_invalido:'Non se puido identificar o dispositivo. Recarga a páxina.',datas_invalidas:'A hora de peche debe ser posterior á de apertura (e futura).'};
@@ -1374,9 +1790,9 @@ setInterval(()=>{
 },1000);
 
 /* Gardado no servidor (borrador do administrador) */
-const UIKEYS=['scope','mes','layout','z','proj','theme'];
+const UIKEYS=['scope','mes','layout','z','proj','theme','cur','evView','evMon'];
 function draftData(){const o={};Object.keys(S).forEach(k=>{if(!UIKEYS.includes(k))o[k]=S[k]});return o}
-function applyDraft(d){Object.keys(d).forEach(k=>{if(!UIKEYS.includes(k))S[k]=d[k]})}
+function applyDraft(d){Object.keys(d).forEach(k=>{if(!UIKEYS.includes(k))S[k]=d[k]});S.mig1405=d.mig1405===true}
 function setSync(t){const b=$('syncBtn');if(!b)return;b.hidden=!CFG||RO;b.textContent='Servidor: '+t}
 async function pushDraft(){
   if(!CFG||RO||!synced||!adminKey())return;
@@ -1389,34 +1805,56 @@ async function startSync(){
   setSync('conectando…');
   try{
     const d=await rpc('ccc_admin_ler',{p_clave:adminKey()});
-    if(d&&typeof d==='object'&&Object.keys(d).length){applyDraft(d);normState();ensureEval();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}synced=true;renderAll();const t=new Date();setSync('cargado '+pad(t.getHours())+':'+pad(t.getMinutes()))}
+    if(d&&typeof d==='object'&&Object.keys(d).length){applyDraft(d);normState();ensureEval();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}synced=true;renderAll();const t=new Date();setSync('cargado '+pad(t.getHours())+':'+pad(t.getMinutes()));if(d.mig1405!==true)pushDraft()}
     else{synced=true;await pushDraft()}
     loadVote();checkPropsPublic().catch(()=>{});
   }catch(e){setSync('sen conectar');toast(errMsg(e));if(/clave_incorrecta/.test((e&&e.message)||''))setKey('')}
 }
-let lastPropsPub=null;
+let lastPropsPub=null,pubDoc=null;
+function isDirty(){if(!pubDoc)return true;const m=pubData();return Object.keys(m).some(k=>JSON.stringify(m[k])!==JSON.stringify(pubDoc[k]))}
+function updatePubBtn(){
+  const b=$('pubBtn');if(!b)return;
+  const on=!!(CFG&&!RO&&adminKey());b.hidden=!on;if(!on)return;
+  const d=isDirty();b.textContent=d?'Publicar · hai cambios':'Publicado';b.classList.toggle('pri',d);
+}
+async function doPublish(msgEl){
+  if(!adminKey()&&!askKey())return;
+  try{
+    await rpc('ccc_admin_publicar',{p_clave:adminKey(),p_datos:pubData()});
+    lastPropsPub=propsSig();pubDoc=JSON.parse(JSON.stringify(pubData()));
+    const m='Publicado. O profesorado verá estas datas en menos dun minuto.';
+    if(msgEl)msgEl.textContent=m;toast(m);
+  }catch(x){const m=errMsg(x);if(msgEl)msgEl.textContent=m;toast(m);if(/clave_incorrecta/.test((x&&x.message)||''))setKey('')}
+  updatePubBtn();
+}
 async function syncPropsPublic(force){
   if(!CFG||RO||!adminKey())return;
-  const sig=JSON.stringify(S.props);
+  const sig=propsSig();
   if(!force&&sig===lastPropsPub)return;
   const cur=(await rpc('ccc_publicado'))||{};
-  cur.props=S.props;
+  cur.props=S.props;cur.showProps=!!S.showProps;cur.showCounter=!!S.showCounter;
   await rpc('ccc_admin_publicar',{p_clave:adminKey(),p_datos:cur});
-  lastPropsPub=sig;
+  lastPropsPub=sig;pubDoc=cur;updatePubBtn();
 }
+function propsSig(){return JSON.stringify([S.props,!!S.showProps,!!S.showCounter])}
 async function checkPropsPublic(){
   const cur=(await rpc('ccc_publicado'))||{};
-  const pub=JSON.stringify((cur.props||[]).filter(Boolean)),mine=JSON.stringify(S.props.filter(Boolean));
-  if(pub!==mine)await syncPropsPublic(true);else lastPropsPub=JSON.stringify(S.props);
+  pubDoc=cur;updatePubBtn();
+  const pub=JSON.stringify([(cur.props||[]).filter(Boolean),cur.showProps===true,cur.showCounter===true]),mine=JSON.stringify([S.props.filter(Boolean),!!S.showProps,!!S.showCounter]);
+  if(pub!==mine)await syncPropsPublic(true);else lastPropsPub=propsSig();
 }
+$('pubBtn').onclick=()=>doPublish(null);
 $('syncBtn').onclick=()=>{if(!adminKey()){askKey();return}if(synced)pushDraft();else startSync()};
 
 /* Versión do profesorado */
-function pubData(){return {start:S.start,locals:S.locals,centro:S.centro,extra:S.extra,e1:S.e1,e2:S.e2,e3:S.e3,acts:S.acts,hitos:S.hitos,colors:S.colors,props:S.props}}
+function pubData(){return {start:S.start,locals:S.locals,centro:S.centro,extra:S.extra,e1:S.e1,e2:S.e2,e3:S.e3,acts:S.acts,hitos:S.hitos,colors:S.colors,props:S.props,showProps:!!S.showProps,showCounter:!!S.showCounter,centroNote:S.centroNote||'',cals:publicCals()}}
 function applyPublished(d){
   if(!d||typeof d!=='object')return;
   ['start','e1','e2','e3'].forEach(k=>{if(typeof d[k]==='string')S[k]=d[k]});
   if(d.colors&&typeof d.colors==='object'&&!Array.isArray(d.colors))S.colors=d.colors;
+  S.showProps=d.showProps===true;S.showCounter=d.showCounter===true;
+  if(typeof d.centroNote==='string')S.centroNote=d.centroNote;
+  if(Array.isArray(d.cals)){S.cals=d.cals.map(c=>Object.assign({ev:[],pub:true},c));S.calsSeed=true}
   if(Array.isArray(d.props)){S.props=d.props.slice(0,8).map(x=>typeof x==='string'?x:'');while(S.props.length<3)S.props.push('');sortProps()}
   ['locals','centro','extra'].forEach(k=>{if(Array.isArray(d[k]))S[k]=d[k]});
   if(d.acts&&typeof d.acts==='object')S.acts=d.acts;
@@ -1431,11 +1869,7 @@ function renderPub(){
 $('pubBox').addEventListener('click',async e=>{
   const b=e.target.closest('button');if(!b||!CFG)return;
   if(b.id==='pubCopy'){try{await navigator.clipboard.writeText(location.origin+location.pathname);toast('Ligazón do profesorado copiada.')}catch(x){toast('Copia a ligazón a man.')}}
-  if(b.id==='pubGo'){
-    if(!adminKey()&&!askKey())return;
-    try{await rpc('ccc_admin_publicar',{p_clave:adminKey(),p_datos:pubData()});lastPropsPub=JSON.stringify(S.props);$('pubMsg').textContent='Publicado. O profesorado verá estas datas en menos dun minuto.'}
-    catch(x){$('pubMsg').textContent=errMsg(x);if(/clave_incorrecta/.test((x&&x.message)||''))setKey('')}
-  }
+  if(b.id==='pubGo')await doPublish($('pubMsg'));
 });
 
 /* ================= Páxina de voto ================= */
@@ -1474,7 +1908,7 @@ async function initVoter(){
       if(done){say('<h1>Votación</h1><div class="note"><b>Voto rexistrado.</b> Grazas.</div>'+closing+calLink);return}
       const opts=(st.opcions||[]).map(o=>{
         const i=LET.indexOf(o.l);let eff='';
-        if(info(o.d).t==='lect'){const e=effect(o.d);eff='Descanso de '+e.rest+' días · '+WD[e.wi]+' '+e.before+' → '+e.after}
+        if(info(o.d).t==='lect'){const e=effect(o.d);eff='Descanso de '+e.rest+' días'+(S.showCounter?' · '+WD[e.wi]+' '+e.before+' → '+e.after:'')}
         return '<button class="vopt" data-vote="'+o.l+'" style="--o:'+OCOL[i]+'" aria-pressed="false"><span class="small">Proposta '+o.l+'</span><b>'+esc(cap(fmtL(o.d)))+'</b><span class="small">'+esc(eff)+'</span></button>';
       }).join('');
       say('<h1>Votación</h1><p>Día non lectivo do centro · curso 2026-27</p>'+closing+'<h3>Escolle unha opción</h3><div class="vopts">'+opts+'<button class="vopt" data-vote="X" style="--o:var(--muted)" aria-pressed="false"><span class="small">Abstención</span><b>Non voto</b></button></div><button class="btn pri" id="vSend" disabled style="width:100%;padding:.8rem">Votar</button><p class="small note" id="vMsg" hidden></p><p class="small muted">Só podes votar unha vez desde este dispositivo, e o voto non se pode cambiar despois de enviado. O teu voto é anónimo: ninguén, nin sequera quen organiza a votación, pode saber que opción escolliches.</p>'+calLink);
